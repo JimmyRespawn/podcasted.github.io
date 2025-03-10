@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Podcasted - Web Player</title>
+  <script>
+  
+  function initIframe() {
+    const iframe = document.getElementById('podcastFrame');
+    const currentParams = new URLSearchParams(window.location.search);
+    
+    
+    let subUrl = 'https://podcasted.glitch.me/';
+    
+    
+    const allowedParams = ['podurl', 'play', 'autoplay'];
+    allowedParams.forEach(param => {
+      if (currentParams.has(param)) {
+        subUrl += (subUrl.includes('?') ? '&' : '?') + 
+                 `${param}=${encodeURIComponent(currentParams.get(param))}`;
+      }
+    });
+
+    
+    iframe.src = subUrl;
+    iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin');
+  }
+  
+  
+  window.addEventListener('DOMContentLoaded', initIframe);
+  </script>
+</head>
+<body>
+  
+  <iframe 
+    id="podcastFrame"
+    frameborder="0" 
+    allow="autoplay; encrypted-media"
+    style="width: 100vw; height: 100vh; position: fixed; top: 0; left: 0"
+  ></iframe>
+</body>
+</html>
