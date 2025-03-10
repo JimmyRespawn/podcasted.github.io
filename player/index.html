@@ -29,17 +29,28 @@
   
   window.addEventListener('DOMContentLoaded', initIframe);
   </script>
-  <style>
-     
-    #podcastFrame {
-      width: 100% !important;     
-      height: 100vh !important;  
-      transform: scale(1);       
-      transform-origin: top left;
-      overflow: auto;            
-      -webkit-overflow-scrolling: touch;  
-    }
-    </style>
+ <style>
+   
+  #episodeList {
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
+    max-height: calc(100vh - 160px);  
+  }
+  
+   
+  #podcastFrame {
+    overscroll-behavior: contain;
+    touch-action: manipulation;
+  }
+  
+   
+  .scroll-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    z-index: 1;
+  }
+  </style>
 </head>
 <body>
   
