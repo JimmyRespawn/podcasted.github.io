@@ -3,6 +3,7 @@
 <html>
 <head>
   <title>Podcasted - Web Player</title>
+  <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-9MWZQQR0YJ"></script>
   <script>
   
   function initIframe() {
@@ -25,21 +26,23 @@
     iframe.src = subUrl;
     iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin');
   }
-
-  
-function resetIframeHeight() {
-  const iframe = document.getElementById('podcastFrame');
-  iframe.style.height = window.innerHeight + 'px';
-}
-  
   
   window.addEventListener('DOMContentLoaded', initIframe);
   
 
-window.addEventListener('resize', resetIframeHeight);
-window.addEventListener('orientationchange', resetIframeHeight);
-resetIframeHeight();
 
+var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-9MWZQQR0YJ');
+        }
+      
 
   </script>
  <style>
