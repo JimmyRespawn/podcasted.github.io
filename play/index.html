@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<html>
+<head>
+  <title>Podcasted - Web Player</title>
+  <script>
+  
+  function initIframe() {
+    const iframe = document.getElementById('podcastFrame');
+    const currentParams = new URLSearchParams(window.location.search);
+    
+    
+    let subUrl = 'https://podcasted.glitch.me/';
+    
+    
+    const allowedParams = ['podurl', 'play', 'autoplay'];
+    allowedParams.forEach(param => {
+      if (currentParams.has(param)) {
+        subUrl += (subUrl.includes('?') ? '&' : '?') + 
+                 `${param}=${encodeURIComponent(currentParams.get(param))}`;
+      }
+    });
+
+    
+    iframe.src = subUrl;
+    iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin');
+  }
+
+  
+function resetIframeHeight() {
+  const iframe = document.getElementById('podcastFrame');
+  iframe.style.height = window.innerHeight + 'px';
+}
+  
+  
+  window.addEventListener('DOMContentLoaded', initIframe);
+  
+
+window.addEventListener('resize', resetIframeHeight);
+window.addEventListener('orientationchange', resetIframeHeight);
+resetIframeHeight();
+
+
+  </script>
+ <style>
+ 
+#podcastFrame {
+  -webkit-overflow-scrolling: touch !important;
+  overflow: auto !important;
+  overscroll-behavior-y: contain;  
+}
+
+ 
+@supports (-webkit-touch-callout: none) {
+  #podcastFrame {
+    height: calc(100vh - env(safe-area-inset-bottom)) !important;
+  }
+}
+  </style>
+</head>
+<body>
+  
+  <iframe 
+    id="podcastFrame"
+    frameborder="0" 
+    allow="autoplay; encrypted-media"
+    style="width: 100vw; height: 100vh; position: fixed; top: 0; left: 0"
+  ></iframe>
+</body>
+</html>
