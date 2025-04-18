@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Podcasted 中文版</title>
+    <link>https://podcasted.linjimi.com/zh/posts/</link>
+    <description>Recent content in Posts on Podcasted 中文版</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Fri, 03 May 2019 05:55:54 +0800</lastBuildDate>
+    <atom:link href="https://podcasted.linjimi.com/zh/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>使用指南</title>
+      <link>https://podcasted.linjimi.com/zh/posts/userguide/</link>
+      <pubDate>Fri, 03 May 2019 05:55:54 +0800</pubDate>
+      <guid>https://podcasted.linjimi.com/zh/posts/userguide/</guid>
+      <description>&lt;p&gt;最后更新：2019 年 5 月 3 日&lt;/p&gt;&#xA;&lt;p&gt;你好，用户，欢迎来到 Podcasted 的快速教程。&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;&lt;strong&gt;添加播客：&lt;/strong&gt;&lt;br&gt;&#xA;你可以通过四种方式添加播客。第一种方式是直接搜索并输入播客名称，然后点击星形按钮收藏。第二种是直接粘贴播客的 RSS 链接，应用将直接打开你提供的播客。第三种是在其他设备上的 Podcasted 中通过 OneDrive 上传收藏列表，再通过 OneDrive 下载回当前设备。最后，你还可以一键导入由其他应用或另一台设备上的 Podcasted 生成的 OPML 文件。&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;&lt;strong&gt;恢复播放：&lt;/strong&gt;&lt;br&gt;&#xA;应用会在关闭时保存当前播放集的进度。下次你在任意设备上使用相同账户登录打开应用时，它会从上次记录的时间继续播放。你可以在设置中关闭此功能。(*Xbox 不会与 PC 和手机之间同步)&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;&lt;strong&gt;同步：&lt;/strong&gt;&lt;br&gt;&#xA;目前应用通过 OneDrive 同步收藏的播客和播放进度。应用仅能访问它自己创建的文件夹，因此你可以放心隐私问题。整个同步过程需你手动完成。我们知道这目前还不够智能，但这能避免播放进度被覆盖。未来我们会加入更智能的同步方式。&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;&lt;strong&gt;高级版：&lt;/strong&gt;&lt;br&gt;&#xA;目前免费版可订阅最多 5 个播客，并含有广告。高级版将无广告并无限制播客订阅。只需一次付费即可在所有 Windows/Xbox 设备上使用高级版，只要你使用的是同一个账户登录。&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;&lt;strong&gt;快捷键：&lt;/strong&gt;&lt;br&gt;&#xA;PC 和 Xbox 版本都支持快捷键。&lt;br&gt;&#xA;&lt;strong&gt;PC 版本：&lt;/strong&gt;&lt;br&gt;&#xA;Ctrl + W 关闭应用；&lt;br&gt;&#xA;Ctrl + T 进入紧凑覆盖模式；&lt;br&gt;&#xA;Ctrl + P 播放/暂停；&lt;br&gt;&#xA;Ctrl + F 打开搜索；&lt;br&gt;&#xA;Ctrl + S 进入设置页面；&lt;br&gt;&#xA;Ctrl + M 静音/取消静音。&lt;br&gt;&#xA;&lt;strong&gt;Xbox 版本：&lt;/strong&gt;&lt;br&gt;&#xA;Y 打开搜索；&lt;br&gt;&#xA;X 聚焦播放按钮；&lt;br&gt;&#xA;视图按钮打开剧集详情窗口。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>服务条款</title>
+      <link>https://podcasted.linjimi.com/zh/posts/tos/</link>
+      <pubDate>Tue, 08 May 2018 05:55:54 +0800</pubDate>
+      <guid>https://podcasted.linjimi.com/zh/posts/tos/</guid>
+      <description>&lt;p&gt;最后更新：2018 年 5 月 8 日&lt;/p&gt;&#xA;&lt;p&gt;请在使用 Podcasted 应用（以下简称“服务”）前，仔细阅读这些服务条款（“条款”、“服务条款”）。&lt;/p&gt;&#xA;&lt;p&gt;您访问和使用本服务的前提是您接受并遵守这些条款。这些条款适用于所有访问者、用户和其他访问或使用服务的人。&lt;/p&gt;&#xA;&lt;p&gt;通过访问或使用本服务，即表示您同意受这些条款的约束。如果您不同意条款的任何部分，则不得访问本服务。本协议为 Podcasted 的服务条款与使用协议。&lt;/p&gt;&#xA;&lt;h2 class=&#34;heading&#34; id=&#34;链接至其他网站&#34;&gt;&#xD;&#xA;  链接至其他网站&#xD;&#xA;  &lt;a href=&#34;#%e9%93%be%e6%8e%a5%e8%87%b3%e5%85%b6%e4%bb%96%e7%bd%91%e7%ab%99&#34;&gt;#&lt;/a&gt;&#xD;&#xA;&lt;/h2&gt;&#xD;&#xA;&lt;p&gt;我们的服务可能包含指向第三方网站或服务的链接，这些网站或服务并非由 Podcasted 拥有或控制。&lt;/p&gt;&#xA;&lt;p&gt;对于任何第三方网站或服务的内容、隐私政策或操作方式，Podcasted 不拥有控制权，也不承担任何责任。您进一步承认并同意，对于因使用或依赖任何此类内容、商品或服务所引起或声称引起的任何损害或损失，Podcasted 不承担任何直接或间接责任。&lt;/p&gt;&#xA;&lt;p&gt;我们强烈建议您在访问任何第三方网站或服务时，阅读其相关条款和隐私政策。&lt;/p&gt;&#xA;&lt;h2 class=&#34;heading&#34; id=&#34;服务终止&#34;&gt;&#xD;&#xA;  服务终止&#xD;&#xA;  &lt;a href=&#34;#%e6%9c%8d%e5%8a%a1%e7%bb%88%e6%ad%a2&#34;&gt;#&lt;/a&gt;&#xD;&#xA;&lt;/h2&gt;&#xD;&#xA;&lt;p&gt;我们可在无需事先通知的情况下立即终止或暂停您访问我们的服务，原因不限，包括但不限于您违反了这些条款。&lt;/p&gt;&#xA;&lt;p&gt;所有根据其性质应在终止后仍然有效的条款将在服务终止后继续有效，包括但不限于所有权条款、免责声明、赔偿义务及责任限制条款。&lt;/p&gt;&#xA;&lt;h2 class=&#34;heading&#34; id=&#34;法律适用&#34;&gt;&#xD;&#xA;  法律适用&#xD;&#xA;  &lt;a href=&#34;#%e6%b3%95%e5%be%8b%e9%80%82%e7%94%a8&#34;&gt;#&lt;/a&gt;&#xD;&#xA;&lt;/h2&gt;&#xD;&#xA;&lt;p&gt;本条款应根据美国华盛顿州法律解释和执行，不考虑其法律冲突规定。&lt;/p&gt;&#xA;&lt;p&gt;我们未能执行本条款中的任何权利或规定，并不视为放弃该权利。如果本条款中的任何规定被法院认定为无效或无法执行，其余条款仍将保持有效。这些条款构成我们与您之间关于服务的完整协议，并取代我们之间之前可能就该服务所作的任何协议。&lt;/p&gt;&#xA;&lt;h2 class=&#34;heading&#34; id=&#34;条款修改&#34;&gt;&#xD;&#xA;  条款修改&#xD;&#xA;  &lt;a href=&#34;#%e6%9d%a1%e6%ac%be%e4%bf%ae%e6%94%b9&#34;&gt;#&lt;/a&gt;&#xD;&#xA;&lt;/h2&gt;&#xD;&#xA;&lt;p&gt;我们保留在任何时候自行决定修改或替换这些条款的权利。如果某次修改是重大变更，我们将在新条款生效前尽量提前 30 天通知您。是否构成重大变更将由我们自行决定。&lt;/p&gt;&#xA;&lt;p&gt;在新条款生效后继续访问或使用我们的服务，即表示您同意受更新后的条款约束。如果您不同意新条款，请停止使用本服务。&lt;/p&gt;&#xA;&lt;h2 class=&#34;heading&#34; id=&#34;联系我们&#34;&gt;&#xD;&#xA;  联系我们&#xD;&#xA;  &lt;a href=&#34;#%e8%81%94%e7%b3%bb%e6%88%91%e4%bb%ac&#34;&gt;#&lt;/a&gt;&#xD;&#xA;&lt;/h2&gt;&#xD;&#xA;&lt;p&gt;如果您对这些条款有任何疑问，请通过以下方式联系我们：&lt;br&gt;&#xA;&lt;a href=&#34;mailto:jimmyrespawn@hotmail.com&#34;&gt;📧 jimmyrespawn@hotmail.com&lt;/a&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>隐私策略</title>
+      <link>https://podcasted.linjimi.com/zh/posts/privacypolicy/</link>
+      <pubDate>Tue, 08 May 2018 05:55:54 +0800</pubDate>
+      <guid>https://podcasted.linjimi.com/zh/posts/privacypolicy/</guid>
+      <description>&lt;p&gt;最后更新：2018 年 5 月 8 日&lt;/p&gt;&#xA;&lt;p&gt;Podcasted 使用您的网络连接来下载和更新内容。它不会收集、使用任何个人信息，不会存储任何个人数据，也不会将其分享给第三方。&lt;/p&gt;&#xA;&lt;h2 class=&#34;heading&#34; id=&#34;使用遥测usage-telemetry&#34;&gt;&#xD;&#xA;  使用遥测（Usage Telemetry）&#xD;&#xA;  &lt;a href=&#34;#%e4%bd%bf%e7%94%a8%e9%81%a5%e6%b5%8busage-telemetry&#34;&gt;#&lt;/a&gt;&#xD;&#xA;&lt;/h2&gt;&#xD;&#xA;&lt;p&gt;我们使用 Visual Studio Application Insights 来跟踪应用的使用情况、发现 bug 以及修复崩溃问题。&lt;br&gt;&#xA;发送到服务器的所有信息都是匿名的，不包含任何用户或上下文数据。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>
