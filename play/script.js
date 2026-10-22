@@ -89,7 +89,14 @@ function navigatePage(direction) {
   updateHistoryButtons();
 }
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
+  await Promise.all(["fluent-button", "fluent-text-field", "fluent-select", "fluent-slider"].map(tag => customElements.whenDefined(tag)));
+  document.getElementById("searchInput").addEventListener("keydown", event => {
+    if (event.key === "Enter" && !event.isComposing) handleSearchSubmit(event);
+  });
+  document.querySelector(".unified-search").addEventListener("click", event => {
+    if (!event.target.closest("fluent-button")) document.getElementById("searchInput").focus();
+  });
   initializePlayer();
   const urlParams = new URLSearchParams(window.location.search);
   const podUrl = urlParams.get("podurl");
@@ -108,6 +115,23 @@ document.addEventListener("DOMContentLoaded", function () {
 // 前端 JavaScript 更新
 // 更新后的加载函数
 let feedRequestId = 0;
+
+function parsePodcastAuthor(channel) {
+  // Match XML names directly: CSS selectors can miss namespaced RSS fields.
+  // Only inspect channel metadata, so an episode's author is never used here.
+  const fields = Array.from(channel.children);
+  const text = element => element?.textContent?.trim() || "";
+  const itunesField = name => fields.find(element => element.localName === name &&
+    (/itunes\.com\/dtds\/podcast/i.test(element.namespaceURI || "") || element.prefix === "itunes"));
+  const owner = itunesField("owner");
+  return text(itunesField("author")) ||
+    text(fields.find(element => element.localName === "creator")) ||
+    text(fields.find(element => element.localName === "author")) ||
+    text(owner && Array.from(owner.children).find(element => element.localName === "name")) ||
+    text(fields.find(element => element.localName === "managingEditor")) ||
+    "Unknown Author";
+}
+
 async function loadPodcastList(podUrl = document.getElementById("searchInput").value.trim(), addHistory = true) {
   if (!podUrl) {
     alert("Please Enter Valid RSS URL");
@@ -140,7 +164,7 @@ async function loadPodcastList(podUrl = document.getElementById("searchInput").v
     const channel = xml.querySelector("channel");
     if (!channel) throw new Error("Invalid podcast RSS feed");
     const title = channel.querySelector("title")?.textContent || "Untitled";
-    const author = channel.querySelector("itunes\\:author")?.textContent || "Unknown Author";
+    const author = parsePodcastAuthor(channel);
     const image = channel.querySelector("itunes\\:image")?.getAttribute("href") ||
                   channel.querySelector("image > url")?.textContent ||
                   "";
@@ -174,7 +198,7 @@ async function loadPodcastList(podUrl = document.getElementById("searchInput").v
     document.getElementById("podcastDesc").textContent = descriptionDocument.body.textContent;
 
 
-    currentPodcastInfo = { author, title, cover: encodeURI(image) };
+    currentPodcastInfo = { author, title, cover: encodeURI(image), feedUrl: podUrl };
 
     const list = document.getElementById("episodeList");
     list.innerHTML = items.map((ep) => {
@@ -189,9 +213,9 @@ async function loadPodcastList(podUrl = document.getElementById("searchInput").v
               <span class="pub-date">${formatDate(ep.pubDate)}</span>
             </div>
           </div>
-          <button type="button" class="episode-play" aria-label="Play ${safeTitle}" title="Play episode">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4 20 12 8 20Z" /></svg>
-          </button>
+          <fluent-button appearance="stealth" type="button" class="episode-play" aria-label="Play ${safeTitle}" title="Play episode">
+            ${fluentIcon("play")}
+          </fluent-button>
         </li>`;
     }).join("");
 
@@ -343,6 +367,20 @@ function updatePlayerInfo() {
   if (playingPodcastInfo?.cover) cover.src = playingPodcastInfo.cover;
   document.getElementById("playerSubtitle").textContent = playingPodcastInfo
     ? `${playingPodcastInfo.title} · ${playingPodcastInfo.author}` : "Podcasted";
+  const canOpen = Boolean(playingPodcastInfo?.feedUrl);
+  ["currentEpisodeTitle", "playerSubtitle"].forEach(id => {
+    const link = document.getElementById(id);
+    link.setAttribute("aria-disabled", String(!canOpen));
+    link.tabIndex = canOpen ? 0 : -1;
+    link.title = canOpen ? "Open podcast episodes" : "";
+  });
+}
+
+function openPlayingPodcast(event) {
+  event.preventDefault();
+  if (!playingPodcastInfo?.feedUrl) return;
+  loadPodcastList(playingPodcastInfo.feedUrl);
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function showPlaybackError(error) {
@@ -362,6 +400,7 @@ function togglePlayback() {
 
 function initializePlayer() {
   const player = document.getElementById("player");
+  let syncingControls = false;
   player.addEventListener("loadedmetadata", () => {
     if (pendingPlaybackPosition === null) return;
     const position = pendingPlaybackPosition;
@@ -383,7 +422,9 @@ function initializePlayer() {
   const updateProgress = () => {
     const duration = Number.isFinite(player.duration) ? player.duration : 0;
     progress.disabled = duration <= 0;
-    progress.value = duration ? player.currentTime / duration * 100 : 0;
+    syncingControls = true;
+    progress.value = String(duration ? player.currentTime / duration * 100 : 0);
+    syncingControls = false;
     document.getElementById("elapsedTime").textContent = formatPodcastDuration(String(Math.floor(player.currentTime || 0)));
     document.getElementById("remainingTime").textContent = "-" + formatPodcastDuration(String(Math.floor(Math.max(0, duration - player.currentTime)) || 0));
     progress.setAttribute("aria-valuetext", `${document.getElementById("elapsedTime").textContent} elapsed`);
@@ -392,14 +433,14 @@ function initializePlayer() {
     const playing = !player.paused && !player.ended;
     playButton.setAttribute("aria-label", playing ? "Pause" : "Play");
     playButton.title = playing ? "Pause" : "Play";
-    document.getElementById("playPauseIcon").setAttribute("d", playing
-      ? "M12 7h9v34h-9ZM28 7h9v34h-9Z" : "M14 6 42 24 14 42Z");
+    playButton.innerHTML = fluentIcon(playing ? "pause" : "play");
     if (playing) document.getElementById("playerStatus").hidden = true;
   };
   ["timeupdate", "loadedmetadata", "durationchange", "emptied"].forEach(event => player.addEventListener(event, updateProgress));
   ["play", "pause", "ended"].forEach(event => player.addEventListener(event, updatePlayback));
   player.addEventListener("error", showPlaybackError);
-  progress.addEventListener("input", () => {
+  progress.addEventListener("change", () => {
+    if (syncingControls) return;
     if (Number.isFinite(player.duration)) player.currentTime = Number(progress.value) / 100 * player.duration;
     updateProgress();
   });
@@ -408,7 +449,8 @@ function initializePlayer() {
   });
   const volume = document.getElementById("volumeControl");
   const muteButton = document.getElementById("muteButton");
-  volume.addEventListener("input", () => {
+  volume.addEventListener("change", () => {
+    if (syncingControls) return;
     player.volume = Number(volume.value);
     player.muted = player.volume === 0;
   });
@@ -418,10 +460,14 @@ function initializePlayer() {
   });
   player.addEventListener("volumechange", () => {
     const muted = player.muted || player.volume === 0;
-    volume.value = player.muted ? 0 : player.volume;
+    syncingControls = true;
+    volume.value = String(player.muted ? 0 : player.volume);
+    syncingControls = false;
     muteButton.setAttribute("aria-label", muted ? "Unmute" : "Mute");
     muteButton.title = muted ? "Unmute" : "Mute";
-    document.getElementById("volumeWaves").style.opacity = muted ? "0.2" : "1";
+    const volumeIcon = muted ? "muted" : player.volume <= 0.33 ? "volumeLow"
+      : player.volume <= 0.66 ? "volumeMedium" : "volume";
+    muteButton.innerHTML = fluentIcon(volumeIcon);
   });
   document.getElementById("playerCover").addEventListener("error", event => { event.target.hidden = true; });
   updateProgress();
@@ -504,7 +550,7 @@ async function searchPodcasts(query = document.getElementById("searchInput").val
   document.getElementById("searchDiv").hidden = false;
   document.getElementById("podcastDetail").hidden = true;
   document.getElementById("browseTitle").textContent = comedyOnly ? "Comedy" : `Results for “${query}”`;
-  document.getElementById("browseEyebrow").textContent = comedyOnly ? "DISCOVER PODCASTS" : "SEARCH PODCASTS";
+  document.getElementById("browseEyebrow").textContent = comedyOnly ? "Dedicated to creators" : "SEARCH PODCASTS";
   document.getElementById("retryBrowse").hidden = true;
 
   document.getElementById("searchEmptyState").hidden = true;
@@ -544,11 +590,12 @@ function displaySearchResults(podcasts) {
 
   podcasts.forEach((podcast) => {
     const li = document.createElement("li");
-    const button = document.createElement("button");
+    const button = document.createElement("fluent-button");
     button.className = "podcast-card";
+    button.setAttribute("appearance", "stealth");
     const artwork = document.createElement("div");
     artwork.className = "card-artwork";
-    artwork.textContent = "♫";
+    artwork.innerHTML = fluentIcon("music");
     const image = document.createElement("img");
     image.src = podcast.artworkUrl600 || podcast.artworkUrl100;
     image.alt = "";
@@ -579,8 +626,8 @@ function showDiscover(addHistory = true) {
   document.getElementById("searchInput").value = "";
   document.getElementById("searchDiv").hidden = false;
   document.getElementById("podcastDetail").hidden = true;
-  document.getElementById("browseTitle").textContent = "Discover";
-  document.getElementById("browseEyebrow").textContent = "DISCOVER PODCASTS";
+  document.getElementById("browseTitle").textContent = "Listen";
+  document.getElementById("browseEyebrow").textContent = "Dedicated to creators";
   document.getElementById("searchEmptyState").hidden = false;
   document.getElementById("searchStatus").hidden = true;
   document.getElementById("searchStatus").classList.remove("is-loading");
