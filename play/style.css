@@ -343,6 +343,10 @@ body.player-expanded { overflow: hidden; }
 @media (max-width: 600px) { #sleepTimerPicker { margin-left: 36px; width: calc(100% - 36px); } .shortcuts-card { padding: 20px; } }
 
 .language-setting { margin-top: 12px; }
+.feed-download { color: var(--text-muted); line-height: 1.6; margin-bottom: 28px; }
+.feed-download p { margin: 0 0 12px; }
+.feed-download-link { display: inline-block; padding: 10px 16px; border: 1px solid var(--search-border); border-radius: 6px; background: var(--surface); color: var(--text); }
+.feed-download-link:hover { background: var(--list-hover); }
 
 /* Only the content between the toolbar and player scrolls. */
 html { height: 100%; overflow: hidden; }

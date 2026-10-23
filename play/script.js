@@ -86,6 +86,7 @@ function navigatePage(direction) {
   pageHistoryIndex = nextIndex;
   const page = pageHistory[pageHistoryIndex];
   document.getElementById("searchInput").value = page.type === "discover" ? "" : page.query;
+  updateSearchClearButton();
   if (page.type === "discover") showDiscover(false);
   else if (page.type === "settings") showSettings(false);
   else if (page.type === "episode") showEpisodeDetails(page.episode, false);
@@ -119,6 +120,15 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (page?.type === "search") document.getElementById("browseTitle").textContent = t("Results for “{query}”", {query: page.query});
     if (visibleEpisode) document.getElementById("episodeDetailMeta").textContent = [formatDate(visibleEpisode.pubDate), visibleEpisode.duration].filter(Boolean).join(" · ");
   });
+  const searchInput = document.getElementById("searchInput");
+  searchInput.addEventListener("input", updateSearchClearButton);
+  searchInput.addEventListener("change", updateSearchClearButton);
+  document.getElementById("clearSearchButton").addEventListener("click", () => {
+    searchInput.value = "";
+    updateSearchClearButton();
+    searchInput.focus();
+  });
+  updateSearchClearButton();
   initializePlayer();
   const themePicker = document.getElementById("themePicker");
   themePicker.value = window.PodcastedTheme.preference;
@@ -132,6 +142,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   if (podUrl) {
     document.getElementById("searchInput").value = podUrl;
+  updateSearchClearButton();
     loadPodcastList(podUrl);
   } else showDiscover();
 
@@ -178,6 +189,7 @@ async function loadPodcastList(podUrl = document.getElementById("searchInput").v
   const feedStatus = document.getElementById("feedStatus");
   feedStatus.hidden = true;
   feedStatus.textContent = "";
+  document.getElementById("feedDownload").hidden = true;
   setLoadingState("feed", true);
   episodeList.innerHTML = "";
 
@@ -275,6 +287,7 @@ async function loadPodcastList(podUrl = document.getElementById("searchInput").v
     const status = document.getElementById("feedStatus");
     status.textContent = t("Unable to load this RSS feed. Check the URL and whether the feed allows browser access (CORS).");
     status.hidden = false;
+    document.getElementById("feedDownload").hidden = false;
   } finally {
     if (requestId === feedRequestId) {
       setLoadingState("feed", false);
@@ -546,9 +559,12 @@ function togglePlayback() {
 }
 
 let playerReturnFocus = null;
+let playerTransition = null;
 function setExpandedPlayer(expanded) {
   const panel = document.getElementById("audioPlayerPanel");
   if (panel.classList.contains("is-expanded") === expanded) return;
+  const previousBounds = panel.getBoundingClientRect();
+  playerTransition?.cancel();
   if (expanded) playerReturnFocus = document.activeElement;
   panel.classList.toggle("is-expanded", expanded);
   document.body.classList.toggle("player-expanded", expanded);
@@ -565,6 +581,21 @@ function setExpandedPlayer(expanded) {
     panel.removeAttribute("aria-modal");
     if (document.getElementById("playbackRate").open) document.getElementById("playbackRate").open = false;
     playerReturnFocus?.focus();
+  }
+  if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const bounds = panel.getBoundingClientRect();
+    // Animate the existing player between its two layouts without replacing audio.
+    const transition = panel.animate([
+      {
+        transform: `translate(${previousBounds.left - bounds.left}px, ${previousBounds.top - bounds.top}px) scale(${previousBounds.width / bounds.width}, ${previousBounds.height / bounds.height})`,
+        transformOrigin: "top left",
+      },
+      { transform: "none", transformOrigin: "top left" },
+    ], { duration: 300, easing: "cubic-bezier(0.2, 0, 0, 1)" });
+    playerTransition = transition;
+    transition.onfinish = () => {
+      if (playerTransition === transition) playerTransition = null;
+    };
   }
 }
 
@@ -820,6 +851,7 @@ function showDiscover(addHistory = true) {
   ++searchRequestId;
   ++feedRequestId;
   document.getElementById("searchInput").value = "";
+  updateSearchClearButton();
   document.getElementById("searchDiv").hidden = false;
   document.getElementById("podcastDetail").hidden = true;
   document.getElementById("browseTitle").textContent = t("Listen");
@@ -853,6 +885,7 @@ function showSettings(addHistory = true) {
   document.getElementById("searchDiv").hidden = true;
   document.getElementById("podcastDetail").hidden = true;
   document.getElementById("searchInput").value = "";
+  updateSearchClearButton();
   document.getElementById("themePicker").value = window.PodcastedTheme.preference;
   document.getElementById("contentScroll").scrollTo({ top: 0 });
 }
@@ -874,4 +907,8 @@ function handleRSSURLEnter(event) {
   if (event.key === "Enter") {
     loadPodcastList();
   }
+}
+
+function updateSearchClearButton() {
+  document.getElementById("clearSearchButton").hidden = !String(document.getElementById("searchInput").value || "").length;
 }

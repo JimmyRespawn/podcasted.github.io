@@ -1,7 +1,9 @@
 // Interface strings only. Podcast metadata always stays in its original language.
 (() => {
   const ja = {
-    'Listen':'聴く', 'Download App':'アプリをダウンロード', 'Settings':'設定',
+    'Try opening this feed in Podcasted for Windows.':'Podcasted for Windows でこのフィードを開いてみてください。',
+    'Download Podcasted for Windows':'Podcasted for Windows をダウンロード',
+    'Clear search':'検索欄をクリア', 'Listen':'聴く', 'Download App':'アプリをダウンロード', 'Settings':'設定',
     'Dedicated to creators':'クリエイターのために', 'Dedicated to creators.':'クリエイターのために。',
     'Find your next favorite podcast':'お気に入りのポッドキャストを見つけよう',
     'Use the search box above to find a podcast by name or topic, or paste an RSS URL to start listening.':'上の検索欄で番組名やトピックを検索するか、RSS URL を貼り付けて再生できます。',
@@ -40,17 +42,62 @@
     'Sleep timer: {time} remaining':'スリープタイマー：残り {time}',
     'No description available for this episode.':'このエピソードには説明がありません。'
   };
+  const fr = {
+    'Try opening this feed in Podcasted for Windows.':'Essayez d’ouvrir ce flux dans Podcasted pour Windows.',
+    'Download Podcasted for Windows':'Télécharger Podcasted pour Windows',
+    'Clear search':'Effacer la recherche', 'Listen':'Écouter', 'Download App':'Télécharger l’application', 'Settings':'Paramètres',
+    'Dedicated to creators':'Au service des créateurs', 'Dedicated to creators.':'Au service des créateurs.',
+    'Find your next favorite podcast':'Trouvez votre prochain podcast préféré',
+    'Use the search box above to find a podcast by name or topic, or paste an RSS URL to start listening.':'Recherchez un podcast par nom ou par sujet ci-dessus, ou collez l’URL d’un flux RSS pour commencer l’écoute.',
+    'APP':'APPLICATION', 'Theme':'Thème', 'Choose how Podcasted looks.':'Choisissez l’apparence de Podcasted.',
+    'System':'Système', 'Light':'Clair', 'Dark':'Sombre', 'Language':'Langue',
+    'Choose the interface language.':'Choisissez la langue de l’interface.', 'Playback':'Lecture',
+    'Sleep timer':'Minuterie de veille', 'Pause playback after a set time.':'Mettez la lecture en pause après un délai défini.',
+    'Off':'Désactivée', '15 minutes':'15 minutes', '30 minutes':'30 minutes', '45 minutes':'45 minutes', '60 minutes':'60 minutes', '90 minutes':'90 minutes',
+    'Keyboard shortcuts':'Raccourcis clavier', 'Available when you are not typing or using a control.':'Disponibles lorsque vous ne saisissez pas de texte et n’utilisez pas de commande.',
+    'Play / pause':'Lecture / pause', 'Back 15 seconds':'Reculer de 15 secondes', 'Forward 30 seconds':'Avancer de 30 secondes',
+    'Volume up / down':'Augmenter / diminuer le volume', 'Mute / unmute':'Couper / rétablir le son',
+    'Expand / collapse player':'Agrandir / réduire le lecteur', 'Close expanded player':'Fermer le lecteur agrandi',
+    'About':'À propos', 'Podcasted Web Player':'Lecteur web Podcasted',
+    'Find podcasts, open an RSS feed, and keep listening where you left off.':'Trouvez des podcasts, ouvrez un flux RSS et reprenez l’écoute là où vous l’avez laissée.',
+    'Your theme and listening progress are saved in this browser.':'Votre thème et votre progression sont enregistrés dans ce navigateur.',
+    'Source on GitHub':'Code source sur GitHub', 'NOW PLAYING':'EN COURS DE LECTURE', 'EPISODE':'ÉPISODE',
+    'About this episode':'À propos de cet épisode', 'Episode website':'Site web de l’épisode',
+    'Choose an episode to start listening':'Choisissez un épisode pour commencer l’écoute',
+    'Close':'Fermer', 'Back':'Précédent', 'Forward':'Suivant', 'Search':'Rechercher', 'Try again':'Réessayer',
+    'Search or enter RSS URL':'Rechercher ou saisir une URL RSS', 'Search podcasts or enter RSS URL':'Rechercher des podcasts ou saisir une URL RSS',
+    'Main navigation':'Navigation principale', 'App navigation':'Navigation de l’application', 'Page navigation':'Navigation des pages',
+    'Podcast player':'Lecteur de podcasts', 'Playback position':'Position de lecture', 'Playback speed':'Vitesse de lecture', 'Volume':'Volume',
+    'Dismiss message':'Fermer le message', 'Open full-screen player':'Ouvrir le lecteur en plein écran', 'Close full-screen player':'Fermer le lecteur en plein écran',
+    'Play':'Lire', 'Pause':'Pause', 'Resume':'Reprendre', 'Play episode':'Lire l’épisode', 'Mute':'Couper le son', 'Unmute':'Rétablir le son',
+    'Open episode details':'Ouvrir les détails de l’épisode', 'Open podcast episodes':'Ouvrir les épisodes du podcast',
+    'Progress restored. Press Play to continue.':'Progression restaurée. Appuyez sur Lire pour continuer.',
+    'Press Play to start listening.':'Appuyez sur Lire pour commencer l’écoute.',
+    'Unable to play this episode. Please try again.':'Impossible de lire cet épisode. Veuillez réessayer.',
+    'Loading episodes…':'Chargement des épisodes…',
+    'Unable to load this RSS feed. Check the URL and whether the feed allows browser access (CORS).':'Impossible de charger ce flux RSS. Vérifiez l’URL et si le flux autorise l’accès depuis le navigateur (CORS).',
+    'No podcasts found. Try another name or topic.':'Aucun podcast trouvé. Essayez un autre nom ou sujet.',
+    'Search failed. Please try again.':'La recherche a échoué. Veuillez réessayer.',
+    'SEARCH PODCASTS':'RECHERCHER DES PODCASTS', 'Results for “{query}”':'Résultats pour « {query} »',
+    'Sleep timer finished. Playback paused.':'Minuterie terminée. Lecture mise en pause.',
+    'Playback pauses in {time}. Choose Off to cancel.':'La lecture sera mise en pause dans {time}. Sélectionnez Désactivée pour annuler.',
+    'Sleep timer: {time} remaining':'Minuterie de veille : {time} restantes',
+    'No description available for this episode.':'Aucune description disponible pour cet épisode.'
+  };
+  const translations = { ja, fr };
+  const supported = ['system', 'en', 'ja', 'fr'];
   const key = 'podcasted.language.v1';
   let preference = 'system';
-  try { const saved = localStorage.getItem(key); if (['system','en','ja'].includes(saved)) preference = saved; } catch {}
+  try { const saved = localStorage.getItem(key); if (supported.includes(saved)) preference = saved; } catch {}
   let language;
   const bindings = [];
   function t(message, values = {}) {
-    const text = language === 'ja' ? ja[message] || message : message;
+    const text = translations[language]?.[message] || message;
     return text.replace(/\{(\w+)\}/g, (match, name) => values[name] ?? match);
   }
   function apply() {
-    language = preference === 'system' ? (/^ja\b/i.test(navigator.languages?.[0] || navigator.language) ? 'ja' : 'en') : preference;
+    const browserLanguage = (navigator.languages?.[0] || navigator.language || 'en').split('-')[0].toLowerCase();
+    language = preference === 'system' ? (translations[browserLanguage] ? browserLanguage : 'en') : preference;
     document.documentElement.lang = language;
     bindings.forEach(({node, attribute, message}) => {
       if (attribute) node.setAttribute(attribute, t(message));
@@ -59,17 +106,17 @@
     // These nodes are replaced by navigation/loading code, so their original text nodes may be detached.
     ['browseTitle', 'browseEyebrow', 'feedStatus', 'searchStatus'].forEach(id => {
       const node = document.getElementById(id);
-      if (!node || (id === 'browseTitle' && !['Listen', ja.Listen].includes(node.textContent))) return;
-      const message = Object.keys(ja).find(key => key === node.textContent || ja[key] === node.textContent);
+      if (!node || (id === 'browseTitle' && !['Listen', ja.Listen, fr.Listen].includes(node.textContent))) return;
+      const message = Object.keys(ja).find(key => key === node.textContent || Object.values(translations).some(dictionary => dictionary[key] === node.textContent));
       if (message) node.textContent = t(message);
     });
     window.dispatchEvent(new Event('podcastedlanguagechange'));
   }
   window.t = t;
   window.PodcastedI18n = {
-    get preference() { return preference; }, get locale() { return language === 'ja' ? 'ja-JP' : 'en-US'; },
+    get preference() { return preference; }, get locale() { return { ja: 'ja-JP', fr: 'fr-FR', en: 'en-US' }[language]; },
     setPreference(value) {
-      if (!['system','en','ja'].includes(value) || value === preference) return;
+      if (!supported.includes(value) || value === preference) return;
       preference = value;
       try { localStorage.setItem(key, value); } catch {}
       apply();
