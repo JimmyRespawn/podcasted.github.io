@@ -169,6 +169,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   initializePlayerTools();
   initializePlayerMoreMenu();
   initializeEpisodeFeatures();
+  initializeMobileHeader();
 });
 
 // 前端 JavaScript 更新
@@ -589,7 +590,7 @@ function setExpandedPlayer(expanded) {
   panel.classList.toggle("is-expanded", expanded);
   document.body.classList.toggle("player-expanded", expanded);
   document.querySelector(".app-main").inert = expanded;
-  document.querySelector(".sidebar").inert = expanded;
+  document.querySelector(".sidebar").inert = expanded || document.body.classList.contains("mobile-header-hidden");
   document.getElementById("expandPlayerButton").setAttribute("aria-expanded", String(expanded));
   document.getElementById("expandPlayerButton").setAttribute("aria-label", expanded ? t("Close full-screen player") : t("Open full-screen player"));
   if (expanded) {
@@ -889,6 +890,7 @@ function showDiscover(addHistory = true) {
 }
 
 function setNavigationView(view) {
+  resetMobileHeader();
   hideLinkedSubscriptions();
   document.getElementById("episodeDetail").hidden = true;
   document.getElementById("settingsPage").hidden = view !== "settings";

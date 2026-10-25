@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
     />
     <title>Podcasted - Web Player</title>
     <meta name="application-name" content="Podcasted" />
@@ -94,7 +94,7 @@
       </section>
       <section id="episodeDetail" aria-labelledby="episodeDetailTitle" hidden>
         <p class="eyebrow">EPISODE</p>
-        <div class="episode-detail-header"><div id="episodeDetailArtwork" class="cover-frame" aria-hidden="true"></div><div class="episode-detail-info"><a id="episodeDetailChannel" href="#" onclick="openEpisodeChannel(event)"></a><h1 id="episodeDetailTitle"></h1><p id="episodeDetailMeta"></p><fluent-button role="button" appearance="primary" id="episodeDetailPlay" onclick="playDetailEpisode()">Play episode</fluent-button><fluent-button id="addDetailToQueue" appearance="subtle">Add to queue</fluent-button><fluent-button id="shareEpisodeButton" appearance="subtle" onclick="openShareDialog(visibleEpisode)">Share episode</fluent-button></div></div>
+        <div class="episode-detail-header"><div id="episodeDetailArtwork" class="cover-frame" aria-hidden="true"></div><div class="episode-detail-info"><a id="episodeDetailChannel" href="#" onclick="openEpisodeChannel(event)"></a><h1 id="episodeDetailTitle"></h1><p id="episodeDetailMeta"></p><div class="episode-detail-actions"><fluent-button role="button" appearance="primary" id="episodeDetailPlay" onclick="playDetailEpisode()">Play episode</fluent-button><fluent-button id="addDetailToQueue" appearance="subtle">Add to queue</fluent-button><fluent-button id="shareEpisodeButton" appearance="subtle" onclick="openShareDialog(visibleEpisode)">Share episode</fluent-button></div></div></div>
         <article class="episode-description-card"><h2>About this episode</h2><div id="episodeDetailDescription"></div><a id="episodeDetailSource" class="about-link" target="_blank" rel="noopener noreferrer" hidden>Episode website <span aria-hidden="true">↗</span></a></article>
       </section>
       <section id="queuePage" aria-labelledby="queueTitle" hidden>
@@ -182,6 +182,7 @@
     <script src="subscriptions.js"></script>
     <script src="queue.js"></script>
     <script src="mini-player.js"></script>
+    <script src="mobile-header.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
