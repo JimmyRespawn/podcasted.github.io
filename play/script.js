@@ -1,4 +1,6 @@
 let currentPodcastInfo = null;
+let currentEpisodes = [];
+let sharedEpisodeStart = null;
 let playingPodcastInfo = null;
 let playingEpisode = null;
 let visibleEpisode = null;
@@ -88,6 +90,7 @@ function navigatePage(direction) {
   document.getElementById("searchInput").value = page.type === "discover" ? "" : page.query;
   updateSearchClearButton();
   if (page.type === "discover") showDiscover(false);
+  else if (page.type === "queue") showQueue(false);
   else if (page.type === "settings") showSettings(false);
   else if (page.type === "episode") showEpisodeDetails(page.episode, false);
   else if (page.type === "feed") loadPodcastList(page.query, false);
@@ -118,7 +121,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.getElementById("expandPlayerButton").setAttribute("aria-label", t(expanded ? "Close full-screen player" : "Open full-screen player"));
     const page = pageHistory[pageHistoryIndex];
     if (page?.type === "search") document.getElementById("browseTitle").textContent = t("Results for “{query}”", {query: page.query});
-    if (visibleEpisode) document.getElementById("episodeDetailMeta").textContent = [formatDate(visibleEpisode.pubDate), visibleEpisode.duration].filter(Boolean).join(" · ");
+    if (visibleEpisode) {
+      document.getElementById("episodeDetailMeta").textContent = [formatDate(visibleEpisode.pubDate), visibleEpisode.duration].filter(Boolean).join(" · ");
+      renderEpisodeShownotes(visibleEpisode);
+    }
   });
   const searchInput = document.getElementById("searchInput");
   searchInput.addEventListener("input", updateSearchClearButton);
@@ -136,20 +142,33 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (themePicker.value !== window.PodcastedTheme.preference) window.PodcastedTheme.setPreference(themePicker.value);
   });
   window.addEventListener("podcastedthemechange", () => { themePicker.value = window.PodcastedTheme.preference; });
+  initializeQueue();
   const urlParams = new URLSearchParams(window.location.search);
+  initializeSubscriptions();
   const podUrl = urlParams.get("podurl");
   const playUrl = urlParams.get("play");
 
   if (podUrl) {
     document.getElementById("searchInput").value = podUrl;
   updateSearchClearButton();
-    loadPodcastList(podUrl);
+    await loadPodcastList(podUrl);
   } else showDiscover();
 
-  if (playUrl) {
-    playEpisode(playUrl);
+  const sharedAudio = urlParams.get("episode");
+  const requestedTime = Number(urlParams.get("t"));
+  const startPosition = Number.isFinite(requestedTime) && requestedTime >= 0 ? requestedTime : 0;
+  if (sharedAudio) {
+    const episode = currentEpisodes.find(item => item.audioUrl === sharedAudio);
+    if (episode) {
+      sharedEpisodeStart = { url: sharedAudio, position: startPosition };
+      showEpisodeDetails(episode);
+    } else showPlayerStatus("This shared episode could not be found in the feed.", "error");
+  } else if (playUrl) {
+    playEpisode(playUrl, undefined, undefined, urlParams.has("t") ? startPosition : null);
   } else restorePlaybackState();
   initializePlayerTools();
+  initializePlayerMoreMenu();
+  initializeEpisodeFeatures();
 });
 
 // 前端 JavaScript 更新
@@ -172,6 +191,20 @@ function parsePodcastAuthor(channel) {
     "Unknown Author";
 }
 
+function parsePodcastCover(channel, feedUrl) {
+  const fields = Array.from(channel.children);
+  const candidates = fields.filter(node => node.localName === "image").map(node =>
+    node.getAttribute("href") || Array.from(node.children).find(child => child.localName === "url")?.textContent);
+  for (const candidate of candidates) {
+    if (!candidate?.trim()) continue;
+    try {
+      const url = new URL(candidate.trim(), feedUrl);
+      if (["https:", "http:"].includes(url.protocol) && !url.username && !url.password) return url.href;
+    } catch { /* Try the next channel artwork field. */ }
+  }
+  return "";
+}
+
 async function loadPodcastList(podUrl = document.getElementById("searchInput").value.trim(), addHistory = true) {
   if (!podUrl) {
     alert("Please Enter Valid RSS URL");
@@ -189,6 +222,10 @@ async function loadPodcastList(podUrl = document.getElementById("searchInput").v
   const feedStatus = document.getElementById("feedStatus");
   feedStatus.hidden = true;
   feedStatus.textContent = "";
+  currentEpisodes = [];
+  document.getElementById("episodeFilterEmpty").hidden = true;
+  document.getElementById("episodeList").hidden = false;
+  document.getElementById("episodeTools").hidden = true;
   document.getElementById("feedDownload").hidden = true;
   setLoadingState("feed", true);
   episodeList.innerHTML = "";
@@ -206,9 +243,7 @@ async function loadPodcastList(podUrl = document.getElementById("searchInput").v
     if (!channel) throw new Error("Invalid podcast RSS feed");
     const title = channel.querySelector("title")?.textContent || "Untitled";
     const author = parsePodcastAuthor(channel);
-    const image = channel.querySelector("itunes\\:image")?.getAttribute("href") ||
-                  channel.querySelector("image > url")?.textContent ||
-                  "";
+    const image = parsePodcastCover(channel, response.url || podUrl);
     const description = channel.querySelector("description")?.textContent || "No description";
 
    const items = Array.from(channel.getElementsByTagName("item")).map(item => {
@@ -233,7 +268,7 @@ async function loadPodcastList(podUrl = document.getElementById("searchInput").v
     podcastInfo.style.display = "flex";
     const podcastCover = document.getElementById("podcastCover");
     podcastCover.hidden = !image;
-    if (image) podcastCover.src = encodeURI(image);
+    if (image) podcastCover.src = image;
     else podcastCover.removeAttribute("src");
     document.getElementById("podcastTitle").textContent = title;
     document.getElementById("podcastAuthor").textContent = `by ${author}`;
@@ -241,7 +276,7 @@ async function loadPodcastList(podUrl = document.getElementById("searchInput").v
     document.getElementById("podcastDesc").textContent = descriptionDocument.body.textContent;
 
 
-    currentPodcastInfo = { author, title, cover: encodeURI(image), feedUrl: podUrl };
+    currentPodcastInfo = { author, title, cover: image, feedUrl: podUrl };
     items.forEach(episode => {
       episode.podcast = currentPodcastInfo;
       episodeCatalog.set(episode.audioUrl, episode);
@@ -252,32 +287,11 @@ async function loadPodcastList(podUrl = document.getElementById("searchInput").v
       updatePlayerInfo();
     }
 
-    const list = document.getElementById("episodeList");
-    list.innerHTML = items.map((ep) => {
-      const safeTitle = escapeHTML(ep.title);
-      const safeUrl = encodeURIComponent(ep.audioUrl);
-      return `
-        <li data-url="${safeUrl}" data-title="${safeTitle}">
-          <div class="episode-copy">
-            <span class="episode-title">${safeTitle}</span>
-            <div class="episode-meta">
-              <span class="duration">${ep.duration}</span>
-              <span class="pub-date" data-date="${escapeHTML(ep.pubDate || "")}">${formatDate(ep.pubDate)}</span>
-            </div>
-          </div>
-          <fluent-button role="button" appearance="subtle" type="button" class="episode-play" aria-label="Play ${safeTitle}" title=t("Play episode")>
-            ${fluentIcon("play")}
-          </fluent-button>
-        </li>`;
-    }).join("");
-
-    list.querySelectorAll("li").forEach((li) => {
-      li.addEventListener("click", () => {
-        const url = decodeURIComponent(li.dataset.url);
-        const title = li.dataset.title;
-        playEpisode(url, title, episodeCatalog.get(url));
-      });
-    });
+    currentEpisodes = items;
+    document.getElementById("episodeFilter").value = "";
+    document.getElementById("episodeSort").value = "newest";
+    document.getElementById("episodeTools").hidden = false;
+    renderEpisodes();
     feedStatus.hidden = true;
 
   } catch (error) {
@@ -343,7 +357,7 @@ document.getElementById("podcastCover").onerror = function () {
 };
 
 // 更新播放函数
-function playEpisode(url, title, episode = episodeCatalog.get(url)) {
+function playEpisode(url, title, episode = episodeCatalog.get(url), startPosition = null) {
   const player = document.getElementById("player");
   const currentEpisodeTitle = document.getElementById("currentEpisodeTitle");
 
@@ -357,7 +371,10 @@ function playEpisode(url, title, episode = episodeCatalog.get(url)) {
     const saved = readPlaybackState();
     playingEpisode = episode || { title: title || "Episode", audioUrl: url, podcast: currentPodcastInfo };
     playingPodcastInfo = playingEpisode.podcast || currentPodcastInfo;
-    pendingPlaybackPosition = saved?.url === url ? saved.position : 0;
+    pendingPlaybackPosition = Number.isFinite(startPosition) ? startPosition
+      : sharedEpisodeStart?.url === url ? sharedEpisodeStart.position
+      : saved?.url === url ? saved.position : 0;
+    sharedEpisodeStart = null;
     player.src = url;
     player.play().catch(showPlaybackError);
     document.getElementById("playPauseButton").disabled = false;
@@ -396,6 +413,8 @@ function seekBackward() {
 }
 
 function updatePlayerInfo() {
+  window.dispatchEvent(new Event("podcastedplayerchange"));
+  syncQueueCurrentEpisode();
   syncMediaMetadata();
   const cover = document.getElementById("playerCover");
   cover.hidden = !playingPodcastInfo?.cover;
@@ -488,12 +507,13 @@ function showEpisodeDetails(episode, addHistory = true) {
   document.getElementById("podcastDetail").hidden = true;
   document.getElementById("episodeDetail").hidden = false;
   visibleEpisode = episode;
+  updateQueueControls();
   document.getElementById("episodeDetailTitle").textContent = episode.title || "Episode";
   const channel = document.getElementById("episodeDetailChannel");
   channel.textContent = episode.podcast?.title || "Podcast";
   channel.hidden = !episode.podcast?.feedUrl;
   document.getElementById("episodeDetailMeta").textContent = [formatDate(episode.pubDate), episode.duration].filter(Boolean).join(" · ");
-  document.getElementById("episodeDetailDescription").textContent = episode.description || t("No description available for this episode.");
+  renderEpisodeShownotes(episode);
   const artwork = document.getElementById("episodeDetailArtwork");
   artwork.innerHTML = fluentIcon("music");
   if (episode.podcast?.cover) {
@@ -702,6 +722,7 @@ function initializePlayer() {
 function formatDate(isoString) {
   if (!isoString) return "";
   const date = new Date(isoString);
+  if (!Number.isFinite(date.getTime())) return "";
   return date.toLocaleDateString(window.PodcastedI18n.locale, {
     year: "numeric",
     month: "short",
@@ -864,12 +885,15 @@ function showDiscover(addHistory = true) {
   document.getElementById("retryBrowse").hidden = true;
   setLoadingState("browse", false);
   setLoadingState("feed", false);
+  renderLinkedSubscriptions();
 }
 
 function setNavigationView(view) {
+  hideLinkedSubscriptions();
   document.getElementById("episodeDetail").hidden = true;
   document.getElementById("settingsPage").hidden = view !== "settings";
-  [["discoverNav", "listen"], ["settingsNav", "settings"]].forEach(([id, name]) => {
+  document.getElementById("queuePage").hidden = view !== "queue";
+  [["discoverNav", "listen"], ["queueNav", "queue"], ["settingsNav", "settings"]].forEach(([id, name]) => {
     const item = document.getElementById(id);
     item.classList.toggle("active", view === name);
     if (view === name) item.setAttribute("aria-current", "page");

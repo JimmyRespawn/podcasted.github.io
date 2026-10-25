@@ -325,6 +325,9 @@ body.player-expanded { overflow: hidden; }
 .episode-description-card { padding: 28px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
 .episode-description-card h2 { margin: 0 0 20px; font-size: 18px; }
 #episodeDetailDescription { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.8; font-size: 15px; }
+.shownote-timestamp { display: inline; padding: 0 3px; border: 0; border-radius: 4px; background: var(--surface-muted); color: var(--focus); font: inherit; font-variant-numeric: tabular-nums; line-height: inherit; text-decoration: underline; text-underline-offset: 3px; }
+.shownote-timestamp:hover { background: var(--control-hover); }
+.shownote-timestamp:disabled { opacity: 0.5; cursor: default; }
 #episodeDetailSource { margin-top: 24px; }
 @media (max-width: 600px) { .episode-detail-header { gap: 16px; flex-wrap: wrap; } .episode-detail-info { flex-basis: 100%; } .episode-description-card { padding: 20px; } }
 
@@ -336,13 +339,92 @@ body.player-expanded { overflow: hidden; }
 .shortcuts-card dl > div { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 0; border-top: 1px solid var(--border); font-size: 14px; }
 .shortcuts-card dd { margin: 0; white-space: nowrap; color: var(--text-muted); }
 .shortcuts-card kbd { font: inherit; font-size: 12px; padding: 3px 7px; border: 1px solid var(--border); border-radius: 4px; background: var(--page-bg); }
-.audio-player #sleepTimerButton { width: auto; min-width: 40px; gap: 3px; }
+.audio-player #playerMoreButton { position: relative; display: grid; place-items: center; width: 40px; height: 40px; padding: 0; flex-shrink: 0; border: 0; border-radius: 50%; color: inherit; background: transparent; }
+#playerMoreButton > svg { width: 24px; height: 24px; }
+#playerMoreButton:hover { background: var(--control-hover); }
+.timer-active-dot { position: absolute; right: 5px; top: 5px; width: 5px; height: 5px; border-radius: 50%; background: var(--focus); }
+#playerMoreMenu { position: fixed; z-index: 60; min-width: 210px; max-width: calc(100vw - 16px); padding: 4px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); box-shadow: 0 8px 28px var(--shadow); }
+#playerMoreMenu > button { display: flex; align-items: center; justify-content: space-between; gap: 20px; width: 100%; min-height: 40px; padding: 10px 12px; border: 0; border-radius: 4px; background: transparent; color: inherit; text-align: left; font-size: 14px; }
+#playerMoreMenu > button:hover:not(:disabled), #playerMoreMenu > button:focus-visible { background: var(--control-hover); }
+#playerMoreMenu > button:disabled { opacity: 0.45; cursor: default; }
 #sleepTimerButton[data-active="true"] { color: var(--colorBrandForeground1, var(--accent)); }
-#sleepTimerLabel { font-size: 10px; font-variant-numeric: tabular-nums; }
-@media (max-width: 760px) { .audio-player:not(.is-expanded) #sleepTimerButton { display: none; } }
+#sleepTimerLabel { font-size: 12px; font-variant-numeric: tabular-nums; }
+@media (max-width: 760px) { .audio-player:not(.is-expanded) #playerMoreButton { width: 30px; height: 36px; } }
 @media (max-width: 600px) { #sleepTimerPicker { margin-left: 36px; width: calc(100% - 36px); } .shortcuts-card { padding: 20px; } }
 
 .language-setting { margin-top: 12px; }
+.queue-count { margin-left: auto; font-size: 12px; color: var(--text-muted); }
+.episode-queue-add, .queue-action { display: grid; place-items: center; flex: 0 0 36px; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: var(--text-muted); }
+.episode-queue-add:hover:not(:disabled), .queue-action:hover:not(:disabled) { background: var(--control-hover); color: var(--text); }
+.episode-queue-add:disabled, .queue-action:disabled { opacity: 0.35; cursor: default; }
+.episode-queue-add svg, .queue-action svg { width: 22px; height: 22px; }
+.queue-action span { font-size: 24px; line-height: 1; }
+.queue-help { color: var(--text-muted); line-height: 1.6; }
+#queueList { margin-top: 24px; }
+#queueList li { display: flex; align-items: center; gap: 16px; padding: 20px; border-bottom: 1px solid var(--border); background: var(--surface); }
+#queueList li:first-child { border-radius: 8px 8px 0 0; }
+#queueList li:last-child { border-radius: 0 0 8px 8px; }
+.queue-subtitle { color: var(--text-muted); font-size: 13px; margin: 6px 0 0; }
+.queue-row-actions { display: flex; flex-shrink: 0; gap: 4px; }
+#queueList .queue-current { background: var(--surface-muted); border-left: 3px solid var(--focus); padding-left: 17px; margin-bottom: 12px; border-radius: 8px; }
+.queue-current-cover { position: relative; display: grid; place-items: center; width: 56px; height: 56px; flex: 0 0 56px; border-radius: 6px; overflow: hidden; background: var(--input-bg); color: var(--text-muted); }
+.queue-current-cover > svg { width: 28px; height: 28px; }
+.queue-current-cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.queue-current-label { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: 11px; font-weight: 600; letter-spacing: 1px; color: var(--focus); }
+.queue-playing-indicator { display: flex; align-items: center; gap: 2px; height: 14px; }
+.queue-playing-indicator i { width: 3px; height: 10px; border-radius: 2px; background: currentColor; animation: queue-playing 0.8s ease-in-out infinite alternate; }
+.queue-playing-indicator i:nth-child(2) { animation-delay: -0.3s; }
+.queue-playing-indicator i:nth-child(3) { animation-delay: -0.6s; }
+.is-paused .queue-playing-indicator i { animation: none; height: 4px; }
+.queue-current-toggle { color: var(--focus); flex-shrink: 0; }
+@keyframes queue-playing { from { transform: scaleY(0.35); } to { transform: scaleY(1); } }
+@media (prefers-reduced-motion: reduce) { .queue-playing-indicator i { animation: none; } }
+@media (max-width: 600px) { #queueList .queue-current { flex-wrap: nowrap; } #queueList .queue-current .episode-copy { flex-basis: auto; } .queue-current-cover { width: 44px; height: 44px; flex-basis: 44px; } }
+@media (max-width: 600px) {
+  .sidebar > nav:not(.settings-nav) { display: flex; margin-left: auto; }
+  .sidebar #discoverNav { display: none; }
+  .sidebar #queueNav { width: 36px; min-height: 36px; justify-content: center; padding: 6px; }
+  #queueNav .nav-label, #queueCount { display: none; }
+  #queueList li { flex-wrap: wrap; gap: 8px; padding: 16px; }
+  #queueList .episode-copy { flex-basis: 100%; }
+  .queue-row-actions { margin-left: auto; }
+  .queue-action { width: 40px; height: 40px; }
+  #addDetailToQueue { margin-top: 8px; }
+  #episodeList li { column-gap: 8px; }
+}
+.subscription-feed-url { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.subscription-card { position: relative; }
+.subscription-remove { position: absolute; z-index: 1; top: 8px; right: 8px; display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 1px solid rgba(255,255,255,0.35); border-radius: 50%; background: rgba(24,24,24,0.82); color: #fff; opacity: 0; pointer-events: none; transition: opacity 0.15s, background 0.15s; }
+.subscription-remove svg { width: 20px; height: 20px; }
+.subscription-card:hover .subscription-remove, .subscription-card:focus-within .subscription-remove { opacity: 1; pointer-events: auto; }
+.subscription-remove:hover { background: #181818; }
+@media (hover: none), (pointer: coarse) { .subscription-remove { opacity: 1; pointer-events: auto; width: 40px; height: 40px; } }
+#subscriptionStatus, #subscriptionsEmpty { color: var(--text-muted); line-height: 1.6; }
+.episode-tools { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin: 24px 0; }
+.episode-filter-field { display: flex; align-items: center; flex: 0 1 390px; max-width: 100%; min-width: 0; height: 44px; padding: 0 4px 0 12px; border: 1px solid var(--search-border); border-radius: 6px; background: var(--search-bg); }
+.episode-filter-field:focus-within { border-color: var(--focus); box-shadow: inset 0 -2px var(--focus); }
+.episode-filter-field fluent-text-input { flex: 1; width: 0; min-width: 0; height: 100%; }
+.episode-filter-field fluent-text-input::part(root) { width: 100%; max-width: none; height: 100%; border: 0; background: transparent; box-shadow: none; }
+.episode-filter-field fluent-text-input::part(control) { width: 100%; min-width: 0; height: 100%; padding: 0; background: transparent; color: var(--text); font: inherit; }
+#clearEpisodeFilter { display: grid; place-items: center; flex: 0 0 36px; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 4px; background: transparent; color: var(--text-muted); }
+#clearEpisodeFilter:hover { background: var(--control-hover); color: var(--text); }
+#clearEpisodeFilter svg { display: block; width: 24px; height: 24px; }
+#episodeSort { width: 160px; }
+.episode-details-link { padding: 0; border: 0; background: transparent; color: inherit; text-align: left; font: inherit; }
+.episode-details-link:hover { text-decoration: underline; }
+#shareEpisodeButton { margin-left: 8px; }
+#episodeFilterEmpty { color: var(--text-muted); padding-block: 20px; }
+#shareDialog { width: min(480px, calc(100% - 32px)); max-height: calc(100dvh - 32px); overflow: auto; padding: 24px; border: 1px solid var(--border); border-radius: 12px; color: var(--text); background: var(--surface); box-shadow: 0 16px 60px var(--shadow); }
+#shareDialog::backdrop { background: rgba(0, 0, 0, 0.45); }
+#shareDialog h2 { margin-top: 0; }
+#shareName { overflow-wrap: anywhere; }
+#shareTimeOption { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-block: 16px; }
+#shareTime { width: 90px; }
+#shareDialog input[type="text"] { min-width: 0; padding: 10px; border: 1px solid var(--search-border); border-radius: 6px; background: var(--search-bg); color: var(--text); }
+#shareUrl { width: 100%; margin-top: 12px; }
+#shareFeedback, #shareLocalNote { color: var(--text-muted); line-height: 1.5; }
+.share-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; }
+@media (max-width: 600px) { .episode-filter-field { flex-basis: 100%; } #shareEpisodeButton { margin: 8px 0 0; } }
 .feed-download { color: var(--text-muted); line-height: 1.6; margin-bottom: 28px; }
 .feed-download p { margin: 0 0 12px; }
 .feed-download-link { display: inline-block; padding: 10px 16px; border: 1px solid var(--search-border); border-radius: 6px; background: var(--surface); color: var(--text); }

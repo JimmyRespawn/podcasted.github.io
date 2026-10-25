@@ -20,6 +20,7 @@
       ? t("Playback pauses in {time}. Choose Off to cancel.", {time}) : t("Pause playback after a set time.");
     const button = document.getElementById("sleepTimerButton");
     button.dataset.active = String(Boolean(deadline));
+    document.querySelector("#playerMoreButton .timer-active-dot").hidden = !deadline;
     button.title = deadline ? t("Sleep timer: {time} remaining", {time}) : t("Sleep timer");
     button.setAttribute("aria-label", button.title);
     const label = document.getElementById("sleepTimerLabel");
