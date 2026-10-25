@@ -307,8 +307,8 @@ body.player-expanded { overflow: hidden; }
   .sidebar { gap: 8px; padding-inline: 12px; }
   .sidebar .settings-nav { margin: 0; }
   .settings-nav .nav-label { display: none; }
-  .settings-nav .nav-item { width: 32px; padding: 6px; min-height: 36px; }
-  .settings-nav .nav-item::before { display: none; }
+  .settings-nav .nav-item { width: 36px; padding: 6px; min-height: 36px; justify-content: center; }
+  .settings-nav .nav-item svg { width: 18px; height: 18px; }
   .sidebar > nav:not(.settings-nav) .nav-item { font-size: 12px; padding-inline: 4px; gap: 6px; }
   .sidebar > nav:not(.settings-nav) .nav-item svg { width: 18px; height: 18px; }
   .setting-card { flex-wrap: wrap; gap: 12px; padding: 20px; }

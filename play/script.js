@@ -345,7 +345,7 @@ async function loadPodcastList(podUrl = document.getElementById("searchInput").v
     console.error("Error:", error);
     episodeList.innerHTML = "";
     const status = document.getElementById("feedStatus");
-    status.textContent = t("Unable to load this RSS feed. Check the URL and whether the feed allows browser access (CORS).");
+    status.textContent = t("This podcast cannot be opened in the web player.");
     status.hidden = false;
     document.getElementById("feedDownload").hidden = false;
   } finally {
