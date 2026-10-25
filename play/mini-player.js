@@ -62,7 +62,9 @@ async function openMiniPlayer() {
     const pip = await window.documentPictureInPicture.requestWindow({width: 360, height: 360});
     miniPlayerWindow = pip;
     const doc = pip.document;
-    doc.title = "Podcasted";
+    doc.title = t("Podcasted");
+    // The artwork player has its own fixed dark surface; it does not sync themes.
+    doc.documentElement.style.colorScheme = "dark";
     const style = doc.createElement("style");
     style.textContent = `
       * { box-sizing: border-box; }
@@ -141,12 +143,10 @@ async function openMiniPlayer() {
     const audio = document.getElementById("player");
     let lastCover = null;
     const sync = () => {
-      const root = getComputedStyle(document.documentElement);
-      [["--bg", "--surface"], ["--fg", "--text"], ["--muted", "--text-muted"], ["--track", "--input-bg"], ["--accent", "--focus"]].forEach(([name, source]) => doc.documentElement.style.setProperty(name, root.getPropertyValue(source)));
       doc.documentElement.lang = document.documentElement.lang;
-      doc.documentElement.style.colorScheme = "dark";
+      doc.title = t("Podcasted");
       title.textContent = playingEpisode?.title || t("Choose an episode to start listening");
-      subtitle.textContent = playingPodcastInfo?.title || "Podcasted";
+      subtitle.textContent = playingPodcastInfo?.title || t("Podcasted");
       const cover = playingPodcastInfo?.cover || "";
       if (cover !== lastCover) {
         lastCover = cover;
@@ -194,7 +194,7 @@ async function openMiniPlayer() {
     doc.addEventListener("pointercancel", () => { dragging = false; revealControls(); });
     revealControls();
     const mediaEvents = ["timeupdate", "play", "pause", "ended", "loadedmetadata", "durationchange", "emptied"];
-    const appEvents = ["podcastedplayerchange", "podcastedlanguagechange", "podcastedthemechange"];
+    const appEvents = ["podcastedplayerchange", "podcastedlanguagechange"];
     mediaEvents.forEach(event => audio.addEventListener(event, sync));
     appEvents.forEach(event => window.addEventListener(event, sync));
     pip.addEventListener("pagehide", () => {

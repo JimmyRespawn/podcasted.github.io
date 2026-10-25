@@ -11,8 +11,9 @@
   function apply() {
     const theme = preference === "system" ? (systemTheme.matches ? "dark" : "light") : preference;
     document.documentElement.dataset.theme = theme;
+    const accentTokens = window.PodcastedAccent.apply(theme);
     const themeColor = document.querySelector('meta[name="theme-color"]');
-    if (themeColor) themeColor.content = theme === "dark" ? "#121212" : "#f5f7fa";
+    if (themeColor) themeColor.content = document.documentElement.style.getPropertyValue("--page-bg");
     if (window.Fluent && window.PodcastedFluentThemes) {
       lightFluentTheme ||= {
         ...window.PodcastedFluentThemes.light,
@@ -21,20 +22,8 @@
         colorNeutralForeground3: "#64748b",
         colorNeutralStroke1: "#d7dfe8",
         colorNeutralStroke2: "#e1e7ee",
-        colorBrandBackground: "#4169bd",
-        colorBrandBackgroundHover: "#3559a4",
-        colorBrandBackgroundPressed: "#2a4887",
-        colorBrandBackgroundSelected: "#3559a4",
-        colorBrandForeground1: "#3559a4",
-        colorBrandStroke1: "#4169bd",
-        colorCompoundBrandBackground: "#4169bd",
-        colorCompoundBrandBackgroundHover: "#3559a4",
-        colorCompoundBrandBackgroundPressed: "#2a4887",
-        colorCompoundBrandStroke: "#4169bd",
-        colorCompoundBrandStrokeHover: "#3559a4",
-        colorCompoundBrandStrokePressed: "#2a4887",
       };
-      window.Fluent.setTheme(theme === "light" ? lightFluentTheme : window.PodcastedFluentThemes.dark);
+      window.Fluent.setTheme({ ...(theme === "light" ? lightFluentTheme : window.PodcastedFluentThemes.dark), ...accentTokens });
     }
   }
   window.PodcastedTheme = {

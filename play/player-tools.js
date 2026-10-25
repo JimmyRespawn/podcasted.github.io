@@ -96,8 +96,15 @@
       if (target instanceof Element && target.closest('input, textarea, select, fluent-text-input, fluent-dropdown, fluent-slider, fluent-listbox, [contenteditable]:not([contenteditable="false"])')) return;
       if (event.key === " " && target instanceof Element && target.closest("button, a, fluent-button")) return;
       const key = event.key.toLowerCase();
+      if (key === "/" && document.querySelector("dialog[open]")) return;
       const hasAudio = Boolean(player.getAttribute("src"));
       const actions = {
+        "/": () => {
+          closePlayerMoreMenu();
+          setExpandedPlayer(false);
+          resetMobileHeader();
+          document.getElementById("searchInput").focus();
+        },
         " ": () => { if (hasAudio) togglePlayback(); },
         k: () => { if (hasAudio) togglePlayback(); },
         arrowleft: () => { if (hasAudio) seekBackward(); },

@@ -1,6 +1,10 @@
 // Interface strings only. Podcast metadata always stays in its original language.
 (() => {
   const ja = {
+    'Primary color':'メインカラー', 'Lighter shades are generated automatically.':'淡い色合いは自動的に生成されます。', 'Reset color':'色をリセット',
+    'Focus search':'検索欄に移動',
+    'Podcasted':'Podcasted', 'Podcasted logo':'Podcasted logo', 'Podcasted - Web Player':'Podcasted - Web Player',
+    'Subscribe':'登録する', 'Subscribed':'登録済み', 'Unsubscribe':'登録を解除',
     'Play from {time}':'{time} から再生',
     'More options':'その他のオプション', 'Mini Player':'ミニプレーヤー', 'Close Mini Player':'ミニプレーヤーを閉じる',
     'Mini Player is not supported in this browser.':'このブラウザーはミニプレーヤーに対応していません。',
@@ -81,6 +85,10 @@
     'No description available for this episode.':'このエピソードには説明がありません。'
   };
   const fr = {
+    'Primary color':'Couleur principale', 'Lighter shades are generated automatically.':'Les teintes claires sont générées automatiquement.', 'Reset color':'Réinitialiser la couleur',
+    'Focus search':'Activer la recherche',
+    'Podcasted':'Podcasted', 'Podcasted logo':'Podcasted logo', 'Podcasted - Web Player':'Podcasted - Web Player',
+    'Subscribe':'S’abonner', 'Subscribed':'Abonné', 'Unsubscribe':'Se désabonner',
     'Play from {time}':'Lire à partir de {time}',
     'More options':'Plus d’options', 'Mini Player':'Mini-lecteur', 'Close Mini Player':'Fermer le mini-lecteur',
     'Mini Player is not supported in this browser.':'Ce navigateur ne prend pas en charge le mini-lecteur.',
@@ -161,6 +169,10 @@
     'No description available for this episode.':'Aucune description disponible pour cet épisode.'
   };
   const zhHant = {
+    'Primary color':'主色', 'Lighter shades are generated automatically.':'自動產生搭配的淺色。', 'Reset color':'恢復預設顏色',
+    'Focus search':'聚焦搜尋框',
+    'Podcasted':'Podcasted', 'Podcasted logo':'Podcasted logo', 'Podcasted - Web Player':'Podcasted - Web Player',
+    'Subscribe':'訂閱', 'Subscribed':'已訂閱', 'Unsubscribe':'取消訂閱',
     'Play from {time}':'從 {time} 開始播放',
     'More options':'更多選項', 'Mini Player':'迷你播放器', 'Close Mini Player':'關閉迷你播放器',
     'Mini Player is not supported in this browser.':'此瀏覽器不支援迷你播放器。',
@@ -230,8 +242,74 @@
     'Sleep timer: {time} remaining':'睡眠計時器：剩餘 {time}',
     'No description available for this episode.':'此單集沒有提供說明。'
   };
-  const translations = { ja, fr, 'zh-Hant': zhHant };
-  const supported = ['system', 'en', 'ja', 'fr', 'zh-Hant'];
+  const zhHans = {
+    'Primary color':'主色', 'Lighter shades are generated automatically.':'自动生成搭配的浅色。', 'Reset color':'恢复默认颜色',
+    'Focus search':'聚焦搜索框',
+    'Podcasted':'播客', 'Podcasted logo':'播客图标', 'Podcasted - Web Player':'播客 - 网页播放器',
+    'Subscribe':'订阅', 'Subscribed':'已订阅', 'Unsubscribe':'取消订阅',
+    'Play from {time}':'从 {time} 开始播放',
+    'More options':'更多选项', 'Mini Player':'迷你播放器', 'Close Mini Player':'关闭迷你播放器',
+    'Mini Player is not supported in this browser.':'此浏览器不支持迷你播放器。',
+    'Unable to open Mini Player. Please try again.':'无法打开迷你播放器，请重试。',
+    'Paused':'已暂停', 'Queue':'待播列表', 'UP NEXT':'接下来播放',
+    'Add to queue':'加入待播列表', 'Already in queue':'已在待播列表中', 'Added to queue.':'已加入待播列表。',
+    'Move up':'上移', 'Move down':'下移', 'Remove from queue':'从待播列表移除',
+    'Clear queue':'清空待播列表', 'Play queue':'播放待播列表', 'Your queue is empty':'待播列表为空',
+    'Add episodes using the + button or from episode details.':'使用＋按钮或从单集详情加入节目。',
+    'Episodes play in order after the current episode ends.':'当前单集播放结束后，将按顺序播放列表中的单集。',
+    'Remove subscription':'移除订阅', 'Your subscriptions':'你的订阅', 'Clear':'清除',
+    'No subscriptions in this list.':'此列表中没有订阅的节目。',
+    'Unable to read the subscriptions in this link.':'无法读取此链接中的订阅列表。',
+    'Search episode titles':'搜索单集标题', 'Sort episodes':'单集排序', 'Newest first':'从新到旧', 'Oldest first':'从旧到新',
+    'Share podcast':'分享节目', 'Share episode':'分享单集', 'No matching episodes.':'未找到匹配的单集。',
+    'Share':'分享', 'Start at':'开始位置', 'Start time':'开始时间', 'Share link':'分享链接', 'Copy link':'复制链接',
+    'Link copied.':'已复制链接。', 'Select and copy the link above.':'请选择并复制上方链接。',
+    'Enter a time such as 12:30.':'请输入时间，例如 12:30。',
+    'Open the hosted website to create a shareable link.':'请打开线上网站以创建分享链接。',
+    'This shared episode could not be found in the feed.':'无法在 RSS 订阅源中找到分享的单集。',
+    'Try opening this feed in Podcasted for Windows.':'试试使用播客 Windows 版打开此 RSS 订阅源。',
+    'Download Podcasted for Windows':'下载播客 Windows 版',
+    'Clear search':'清除搜索', 'Listen':'收听', 'Download App':'下载应用', 'Settings':'设置',
+    'Dedicated to creators':'献给创作者', 'Dedicated to creators.':'献给创作者。',
+    'Find your next favorite podcast':'寻找下一个喜欢的播客',
+    'Use the search box above to find a podcast by name or topic, or paste an RSS URL to start listening.':'在上方搜索框输入节目名称或主题，或粘贴 RSS 地址，即可开始收听。',
+    'APP':'应用', 'Theme':'主题', 'Choose how Podcasted looks.':'选择播客的外观。',
+    'System':'跟随系统', 'Light':'浅色', 'Dark':'深色', 'Language':'语言',
+    'Choose the interface language.':'选择界面语言。', 'Playback':'播放',
+    'Sleep timer':'睡眠定时', 'Pause playback after a set time.':'在指定时间后暂停播放。',
+    'Off':'关闭', '15 minutes':'15 分钟', '30 minutes':'30 分钟', '45 minutes':'45 分钟', '60 minutes':'60 分钟', '90 minutes':'90 分钟',
+    'Keyboard shortcuts':'键盘快捷键', 'Available when you are not typing or using a control.':'未输入文字或操作控件时可以使用。',
+    'Play / pause':'播放／暂停', 'Back 15 seconds':'后退 15 秒', 'Forward 30 seconds':'前进 30 秒',
+    'Volume up / down':'增大／减小音量', 'Mute / unmute':'静音／取消静音',
+    'Expand / collapse player':'展开／收起播放器', 'Close expanded player':'关闭展开的播放器',
+    'About':'关于', 'Podcasted Web Player':'播客网页播放器',
+    'Find podcasts, open an RSS feed, and keep listening where you left off.':'搜索节目、打开 RSS 订阅源，随时从上次的位置继续收听。',
+    'Your theme and listening progress are saved in this browser.':'主题和播放进度会保存在此浏览器中。',
+    'Source on GitHub':'在 GitHub 查看源代码', 'NOW PLAYING':'正在播放', 'EPISODE':'单集',
+    'About this episode':'关于此单集', 'Episode website':'单集网站',
+    'Choose an episode to start listening':'选择单集以开始收听',
+    'Close':'关闭', 'Back':'上一页', 'Forward':'下一页', 'Search':'搜索', 'Try again':'重试',
+    'Search or enter RSS URL':'搜索或输入 RSS 地址', 'Search podcasts or enter RSS URL':'搜索播客或输入 RSS 地址',
+    'Main navigation':'主导航', 'App navigation':'应用导航', 'Page navigation':'页面导航',
+    'Podcast player':'播客播放器', 'Playback position':'播放位置', 'Playback speed':'播放速度', 'Volume':'音量',
+    'Dismiss message':'关闭消息', 'Open full-screen player':'打开全屏播放器', 'Close full-screen player':'关闭全屏播放器',
+    'Play':'播放', 'Pause':'暂停', 'Resume':'继续播放', 'Play episode':'播放单集', 'Mute':'静音', 'Unmute':'取消静音',
+    'Open episode details':'打开单集详情', 'Open podcast episodes':'打开节目单集列表',
+    'Progress restored. Press Play to continue.':'已恢复播放进度，按下播放即可继续收听。',
+    'Press Play to start listening.':'按下播放以开始收听。',
+    'Unable to play this episode. Please try again.':'无法播放此单集，请重试。',
+    'Loading episodes…':'正在加载单集…',
+    'Unable to load this RSS feed. Check the URL and whether the feed allows browser access (CORS).':'无法加载此 RSS 订阅源。请检查地址，以及订阅源是否允许浏览器访问（CORS）。',
+    'No podcasts found. Try another name or topic.':'未找到节目，请尝试其他名称或主题。',
+    'Search failed. Please try again.':'搜索失败，请重试。',
+    'SEARCH PODCASTS':'搜索播客', 'Results for “{query}”':'“{query}”的搜索结果',
+    'Sleep timer finished. Playback paused.':'睡眠定时已结束，播放已暂停。',
+    'Playback pauses in {time}. Choose Off to cancel.':'将在 {time} 后暂停播放。选择“关闭”即可取消。',
+    'Sleep timer: {time} remaining':'睡眠定时：剩余 {time}',
+    'No description available for this episode.':'此单集没有提供说明。'
+  };
+  const translations = { ja, fr, 'zh-Hant': zhHant, 'zh-Hans': zhHans };
+  const supported = ['system', 'en', 'ja', 'fr', 'zh-Hant', 'zh-Hans'];
   const key = 'podcasted.language.v1';
   let preference = 'system';
   try { const saved = localStorage.getItem(key); if (supported.includes(saved)) preference = saved; } catch {}
@@ -243,10 +321,15 @@
   }
   function apply() {
     const browserTag = (navigator.languages?.[0] || navigator.language || 'en').toLowerCase();
-    const browserLanguage = /^zh-(?:hant(?:-|$)|(?:tw|hk|mo)$)/.test(browserTag)
-      ? 'zh-Hant' : browserTag.split('-')[0];
+    const parts = browserTag.split('-');
+    const browserLanguage = parts[0] === 'zh'
+      ? (parts.includes('hant') || (!parts.includes('hans') && parts.some(part => ['tw', 'hk', 'mo'].includes(part))) ? 'zh-Hant' : 'zh-Hans')
+      : parts[0];
     language = preference === 'system' ? (translations[browserLanguage] ? browserLanguage : 'en') : preference;
     document.documentElement.lang = language;
+    document.title = t('Podcasted - Web Player');
+    document.querySelectorAll('meta[name="application-name"], meta[name="apple-mobile-web-app-title"]').forEach(node => { node.content = t('Podcasted'); });
+    document.querySelector('.brand img')?.setAttribute('alt', t('Podcasted logo'));
     bindings.forEach(({node, attribute, message}) => {
       if (attribute) node.setAttribute(attribute, t(message));
       else if (node.isConnected) node.nodeValue = t(message);
@@ -262,7 +345,7 @@
   }
   window.t = t;
   window.PodcastedI18n = {
-    get preference() { return preference; }, get locale() { return { ja: 'ja-JP', fr: 'fr-FR', en: 'en-US', 'zh-Hant': 'zh-TW' }[language]; },
+    get preference() { return preference; }, get locale() { return { ja: 'ja-JP', fr: 'fr-FR', en: 'en-US', 'zh-Hant': 'zh-TW', 'zh-Hans': 'zh-CN' }[language]; },
     setPreference(value) {
       if (!supported.includes(value) || value === preference) return;
       preference = value;

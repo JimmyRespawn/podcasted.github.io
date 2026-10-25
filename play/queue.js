@@ -156,7 +156,7 @@ function renderQueue() {
     action("Move up", '<span aria-hidden="true">↑</span>', () => move(-1), index === 0);
     action("Move down", '<span aria-hidden="true">↓</span>', () => move(1), index === episodeQueue.length - 1);
     action("Play episode", fluentIcon("play"), () => playQueuedEpisode(index));
-    action("Remove from queue", '<span aria-hidden="true">×</span>', () => {
+    action("Remove from queue", '<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>', () => {
       episodeQueue.splice(index, 1);
       saveQueue();
       const rows = document.querySelectorAll("#queueList li:not(.queue-current)");

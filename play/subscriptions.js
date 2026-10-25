@@ -1,5 +1,7 @@
 // Keep the latest imported list until the user clears it.
 const subscriptionStorageKey = "podcasted.subscriptions.v1";
+// Testing only: set to false to hide the channel Subscribe button for release.
+const SHOW_SUBSCRIBE_BUTTON = false;
 let linkedSubscriptions = null;
 let subscriptionImportError = false;
 let subscriptionGeneration = 0;
@@ -70,16 +72,45 @@ function removeLinkedSubscription(feedUrl) {
   if (!linkedSubscriptions) return;
   const index = linkedSubscriptions.findIndex(item => item.feedUrl === feedUrl);
   linkedSubscriptions = linkedSubscriptions.filter(item => item.feedUrl !== feedUrl);
-  const data = JSON.stringify({v: 1, feeds: linkedSubscriptions.map(item => item.feedUrl)});
+  persistLinkedSubscriptions();
+  renderLinkedSubscriptions();
+  const buttons = document.querySelectorAll("#subscriptionsList .subscription-remove");
+  (buttons[Math.min(index, buttons.length - 1)] || document.getElementById("clearSubscriptions")).focus();
+}
+
+function persistLinkedSubscriptions() {
+  const data = JSON.stringify({v: 1, feeds: (linkedSubscriptions || []).map(item => item.feedUrl)});
   const bytes = new TextEncoder().encode(data);
   const encoded = btoa(Array.from(bytes, byte => String.fromCharCode(byte)).join(""))
     .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
   try { localStorage.setItem(subscriptionStorageKey, encoded); } catch { /* Optional persistence. */ }
   // Prevent the original import link from adding a removed feed again on refresh.
   removeSubscriptionUrlParameters();
-  renderLinkedSubscriptions();
-  const buttons = document.querySelectorAll("#subscriptionsList .subscription-remove");
-  (buttons[Math.min(index, buttons.length - 1)] || document.getElementById("clearSubscriptions")).focus();
+  subscriptionImportError = false;
+  updateSubscribeButton();
+}
+
+function updateSubscribeButton() {
+  const button = document.getElementById("subscribePodcastButton");
+  button.hidden = !SHOW_SUBSCRIBE_BUTTON || !currentPodcastInfo?.feedUrl;
+  const subscribed = Boolean(linkedSubscriptions?.some(item => item.feedUrl === currentPodcastInfo?.feedUrl));
+  button.textContent = t(subscribed ? "Subscribed" : "Subscribe");
+  button.title = t(subscribed ? "Unsubscribe" : "Subscribe");
+  button.setAttribute("aria-pressed", String(subscribed));
+  button.setAttribute("appearance", subscribed ? "subtle" : "primary");
+}
+
+function toggleCurrentSubscription() {
+  if (!SHOW_SUBSCRIBE_BUTTON || !currentPodcastInfo?.feedUrl) return;
+  let feedUrl;
+  try { feedUrl = subscriptionHttpUrl(currentPodcastInfo.feedUrl); } catch { return; }
+  const subscribed = linkedSubscriptions?.some(item => item.feedUrl === feedUrl);
+  if (subscribed) linkedSubscriptions = linkedSubscriptions.filter(item => item.feedUrl !== feedUrl);
+  else {
+    linkedSubscriptions = [...(linkedSubscriptions || []), {feedUrl}];
+    subscriptionMetadata.set(feedUrl, {...currentPodcastInfo});
+  }
+  persistLinkedSubscriptions();
 }
 
 function hideLinkedSubscriptions() {
@@ -176,9 +207,12 @@ function renderLinkedSubscriptions() {
 
 function initializeSubscriptions() {
   readLinkedSubscriptions();
+  updateSubscribeButton();
+  document.getElementById("subscribePodcastButton").addEventListener("click", toggleCurrentSubscription);
   document.getElementById("clearSubscriptions").addEventListener("click", clearLinkedSubscriptions);
   window.addEventListener("hashchange", () => { readLinkedSubscriptions(); showDiscover(); });
   window.addEventListener("podcastedlanguagechange", () => {
+    updateSubscribeButton();
     if (pageHistory[pageHistoryIndex]?.type === "discover") renderLinkedSubscriptions();
   });
 }

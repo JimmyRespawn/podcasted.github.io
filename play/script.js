@@ -138,10 +138,33 @@ document.addEventListener("DOMContentLoaded", async function () {
   initializePlayer();
   const themePicker = document.getElementById("themePicker");
   themePicker.value = window.PodcastedTheme.preference;
+  let themePickerInteraction = false;
+  themePicker.addEventListener("pointerdown", () => { themePickerInteraction = true; });
+  themePicker.addEventListener("keydown", () => { themePickerInteraction = true; });
+  document.addEventListener("pointerdown", event => {
+    if (!event.composedPath().includes(themePicker)) themePickerInteraction = false;
+  }, true);
   themePicker.addEventListener("change", () => {
+    // Dropdown initialization/focus updates must not change the saved appearance.
+    if (!themePickerInteraction || document.getElementById("settingsPage").hidden) {
+      themePicker.value = window.PodcastedTheme.preference;
+      return;
+    }
+    themePickerInteraction = false;
     if (themePicker.value !== window.PodcastedTheme.preference) window.PodcastedTheme.setPreference(themePicker.value);
   });
   window.addEventListener("podcastedthemechange", () => { themePicker.value = window.PodcastedTheme.preference; });
+  const accentPicker = document.getElementById("accentColorPicker");
+  const syncAccentPicker = () => {
+    accentPicker.value = window.PodcastedAccent.color;
+    document.getElementById("accentColorValue").textContent = window.PodcastedAccent.color.toUpperCase();
+    document.getElementById("resetAccentColor").disabled = window.PodcastedAccent.color === window.PodcastedAccent.defaultColor;
+  };
+  accentPicker.addEventListener("input", () => window.PodcastedAccent.setColor(accentPicker.value));
+  accentPicker.addEventListener("change", () => window.PodcastedAccent.setColor(accentPicker.value));
+  document.getElementById("resetAccentColor").addEventListener("click", () => window.PodcastedAccent.setColor(window.PodcastedAccent.defaultColor));
+  window.addEventListener("podcastedaccentchange", syncAccentPicker);
+  syncAccentPicker();
   initializeQueue();
   const urlParams = new URLSearchParams(window.location.search);
   initializeSubscriptions();
@@ -206,12 +229,30 @@ function parsePodcastCover(channel, feedUrl) {
   return "";
 }
 
+function parseEpisodeCover(item, feedUrl) {
+  const cover = parsePodcastCover(item, feedUrl);
+  if (cover) return cover;
+  // Some publishers use Media RSS instead of an iTunes image.
+  const candidates = Array.from(item.getElementsByTagName("*")).filter(node =>
+    (node.localName === "thumbnail" && /search\.yahoo\.com\/mrss/.test(node.namespaceURI || "")) ||
+    (node.localName === "content" && (node.getAttribute("medium") === "image" || /^image\//i.test(node.getAttribute("type") || ""))));
+  for (const node of candidates) {
+    const value = node.getAttribute("url");
+    if (!value?.trim()) continue;
+    try {
+      const url = new URL(value.trim(), feedUrl);
+      if (["https:", "http:"].includes(url.protocol) && !url.username && !url.password) return url.href;
+    } catch { /* Try the next episode artwork field. */ }
+  }
+  return "";
+}
+
 async function loadPodcastList(podUrl = document.getElementById("searchInput").value.trim(), addHistory = true) {
   if (!podUrl) {
     alert("Please Enter Valid RSS URL");
     return;
   }
-  setNavigationView("listen");
+  setNavigationView("feed");
 
   if (addHistory) recordPage({ type: "feed", query: podUrl });
   const episodeList = document.getElementById("episodeList");
@@ -250,13 +291,16 @@ async function loadPodcastList(podUrl = document.getElementById("searchInput").v
    const items = Array.from(channel.getElementsByTagName("item")).map(item => {
   const getText = (tag) => item.getElementsByTagName(tag)[0]?.textContent?.trim() || "";
   const getAttr = (tag, attr) => item.getElementsByTagName(tag)[0]?.getAttribute(attr) || "";
+  const descriptionHtml = getText("content:encoded") || getText("description") || getText("itunes:summary");
 
   return {
     title: getText("title") || "No Title",
     audioUrl: getAttr("enclosure", "url"),
+    cover: parseEpisodeCover(item, response.url || podUrl),
     pubDate: getText("pubDate"),
     duration: formatPodcastDuration(getText("itunes:duration") || "0"),
-    description: plainEpisodeDescription(getText("content:encoded") || getText("description") || getText("itunes:summary")),
+    description: plainEpisodeDescription(descriptionHtml),
+    descriptionHtml,
     link: getText("link")
   };
 });
@@ -277,7 +321,8 @@ async function loadPodcastList(podUrl = document.getElementById("searchInput").v
     document.getElementById("podcastDesc").textContent = descriptionDocument.body.textContent;
 
 
-    currentPodcastInfo = { author, title, cover: image, feedUrl: podUrl };
+    currentPodcastInfo = { author, title, cover: image, feedUrl: new URL(podUrl).href };
+    updateSubscribeButton();
     items.forEach(episode => {
       episode.podcast = currentPodcastInfo;
       episodeCatalog.set(episode.audioUrl, episode);
@@ -414,6 +459,7 @@ function seekBackward() {
 }
 
 function updatePlayerInfo() {
+  updateEpisodeListPlaybackState();
   window.dispatchEvent(new Event("podcastedplayerchange"));
   syncQueueCurrentEpisode();
   syncMediaMetadata();
@@ -421,7 +467,7 @@ function updatePlayerInfo() {
   cover.hidden = !playingPodcastInfo?.cover;
   if (playingPodcastInfo?.cover) cover.src = playingPodcastInfo.cover;
   document.getElementById("playerSubtitle").textContent = playingPodcastInfo
-    ? `${playingPodcastInfo.title} · ${playingPodcastInfo.author}` : "Podcasted";
+    ? `${playingPodcastInfo.title} · ${playingPodcastInfo.author}` : t("Podcasted");
   ["currentEpisodeTitle", "playerSubtitle"].forEach(id => {
     const canOpen = id === "currentEpisodeTitle" ? Boolean(playingEpisode?.audioUrl) : Boolean(playingPodcastInfo?.feedUrl);
     const link = document.getElementById(id);
@@ -437,8 +483,8 @@ function syncMediaMetadata(useAppIcon = false) {
   if (!player.getAttribute("src")) return;
   try {
     navigator.mediaSession.metadata = new MediaMetadata({
-      title: playingEpisode?.title || document.getElementById("currentEpisodeTitle").textContent || "Podcasted",
-      artist: playingPodcastInfo?.title || playingPodcastInfo?.author || "Podcasted",
+      title: playingEpisode?.title || document.getElementById("currentEpisodeTitle").textContent || t("Podcasted"),
+      artist: playingPodcastInfo?.title || playingPodcastInfo?.author || t("Podcasted"),
       album: playingPodcastInfo?.author || "",
       artwork: generateArtworkArray(useAppIcon ? null : playingPodcastInfo?.cover),
     });
@@ -503,7 +549,7 @@ function showEpisodeDetails(episode, addHistory = true) {
   if (addHistory) recordPage({ type: "episode", query: "", episode });
   ++feedRequestId;
   ++searchRequestId;
-  setNavigationView("listen");
+  setNavigationView("episode");
   document.getElementById("searchDiv").hidden = true;
   document.getElementById("podcastDetail").hidden = true;
   document.getElementById("episodeDetail").hidden = false;
@@ -517,12 +563,18 @@ function showEpisodeDetails(episode, addHistory = true) {
   renderEpisodeShownotes(episode);
   const artwork = document.getElementById("episodeDetailArtwork");
   artwork.innerHTML = fluentIcon("music");
-  if (episode.podcast?.cover) {
+  const covers = [...new Set([episode.cover, episode.podcast?.cover].filter(Boolean))];
+  if (covers.length) {
     const image = document.createElement("img");
     image.className = "cover";
     image.alt = "";
-    image.src = episode.podcast.cover;
-    image.onerror = () => image.remove();
+    let index = 0;
+    image.onerror = () => {
+      index++;
+      if (index < covers.length) image.src = covers[index];
+      else image.remove();
+    };
+    image.src = covers[index];
     artwork.appendChild(image);
   }
   const source = document.getElementById("episodeDetailSource");
@@ -710,8 +762,7 @@ function initializePlayer() {
     syncingControls = false;
     muteButton.setAttribute("aria-label", muted ? t("Unmute") : t("Mute"));
     muteButton.title = muted ? t("Unmute") : t("Mute");
-    const volumeIcon = muted ? "muted" : player.volume <= 0.33 ? "volumeLow"
-      : player.volume <= 0.66 ? "volumeMedium" : "volume";
+    const volumeIcon = muted ? "muted" : player.volume <= 0.66 ? "volumeMedium" : "volume";
     muteButton.innerHTML = fluentIcon(volumeIcon);
   });
   document.getElementById("playerCover").addEventListener("error", event => { event.target.hidden = true; syncMediaMetadata(true); });
@@ -791,7 +842,7 @@ function requestPodcastSearch(query, requestId, comedyOnly = false) {
 
 async function searchPodcasts(query = document.getElementById("searchInput").value.trim(), comedyOnly = false, addHistory = true) {
   if (!query) return;
-  setNavigationView("listen");
+  setNavigationView("search");
   if (addHistory) recordPage({ type: comedyOnly ? "discover" : "search", query });
   const requestId = ++searchRequestId;
   ++feedRequestId;
