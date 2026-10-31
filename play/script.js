@@ -49,7 +49,6 @@ function restorePlaybackState() {
   document.getElementById("playPauseButton").disabled = false;
   document.getElementById("elapsedTime").textContent = formatPodcastDuration(String(Math.floor(state.position)));
   updatePlayerInfo();
-  showPlayerStatus("Progress restored. Press Play to continue.");
 }
 function setLoadingState(type, loading) {
   const isFeed = type === "feed";
@@ -215,6 +214,56 @@ function parsePodcastAuthor(channel) {
     "Unknown Author";
 }
 
+function parsePodcastMetadata(channel, feedUrl) {
+  const fields = Array.from(channel.children);
+  const categories = [];
+  const readCategory = node => {
+    const value = (node.getAttribute("text") || Array.from(node.childNodes)
+      .filter(child => child.nodeType === 3).map(child => child.textContent).join("")).trim();
+    if (value && !categories.includes(value)) categories.push(value);
+    Array.from(node.children).filter(child => child.localName === "category").forEach(readCategory);
+  };
+  fields.filter(node => node.localName === "category").forEach(readCategory);
+  let website = "";
+  for (const node of fields.filter(node => node.localName === "link" && !node.namespaceURI)) {
+    try {
+      const url = new URL(node.textContent.trim(), feedUrl);
+      if (node.textContent.trim() && ["http:", "https:"].includes(url.protocol) && !url.username && !url.password) {
+        website = url.href;
+        break;
+      }
+    } catch { /* Ignore invalid website links. */ }
+  }
+  const updateFrequency = fields.find(node => node.localName === "updateFrequency" &&
+    ["https://podcastindex.org/namespace/1.0", "https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md"].includes(node.namespaceURI))?.textContent.trim() || "";
+  return { categories, website, updateFrequency };
+}
+
+function renderPodcastMetadata(metadata) {
+  const container = document.getElementById("podcastMetadata");
+  container.replaceChildren();
+  for (const category of metadata.categories) {
+    const badge = document.createElement("span");
+    badge.className = "podcast-category";
+    badge.textContent = category;
+    container.appendChild(badge);
+  }
+  if (metadata.website) {
+    const link = document.createElement("a");
+    link.href = metadata.website;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = new URL(metadata.website).hostname.replace(/^www\./, "");
+    container.appendChild(link);
+  }
+  if (metadata.updateFrequency) {
+    const schedule = document.createElement("span");
+    schedule.textContent = metadata.updateFrequency;
+    container.appendChild(schedule);
+  }
+  container.hidden = !container.childNodes.length;
+}
+
 function parsePodcastCover(channel, feedUrl) {
   const fields = Array.from(channel.children);
   const candidates = fields.filter(node => node.localName === "image").map(node =>
@@ -316,12 +365,14 @@ async function loadPodcastList(podUrl = document.getElementById("searchInput").v
     if (image) podcastCover.src = image;
     else podcastCover.removeAttribute("src");
     document.getElementById("podcastTitle").textContent = title;
-    document.getElementById("podcastAuthor").textContent = `by ${author}`;
+    document.getElementById("podcastAuthor").textContent = author;
     const descriptionDocument = new DOMParser().parseFromString(description, "text/html");
     document.getElementById("podcastDesc").textContent = descriptionDocument.body.textContent;
 
 
-    currentPodcastInfo = { author, title, cover: image, feedUrl: new URL(podUrl).href };
+    const metadata = parsePodcastMetadata(channel, response.url || podUrl);
+    renderPodcastMetadata(metadata);
+    currentPodcastInfo = { author, title, cover: image, feedUrl: new URL(podUrl).href, ...metadata };
     updateSubscribeButton();
     items.forEach(episode => {
       episode.podcast = currentPodcastInfo;
@@ -746,6 +797,11 @@ function initializePlayer() {
   });
   const volume = document.getElementById("volumeControl");
   const muteButton = document.getElementById("muteButton");
+  // iPadOS can identify itself as macOS; touch points distinguish it from a Mac.
+  const usesSystemVolume = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  volume.hidden = usesSystemVolume;
+  volume.disabled = usesSystemVolume;
   volume.addEventListener("change", () => {
     if (syncingControls) return;
     player.volume = Number(volume.value);

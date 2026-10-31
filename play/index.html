@@ -16,6 +16,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="favicon.png" />
     <link rel="manifest" href="manifest.webmanifest" />
+    <script src="analytics.js"></script>
     <script src="accent-color.js"></script>
     <script src="theme-preference.js"></script>
     <link rel="stylesheet" href="style.css" />
@@ -77,11 +78,14 @@
         <div id="feedLoading" class="loading-skeleton" aria-hidden="true" hidden></div>
         <div id="podcastInfo" class="podcast-info" style="display: none"><div class="cover-frame"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M18.25 11C18.6297 11 18.9435 11.2822 18.9932 11.6482L19 11.75V12.25C19 15.8094 16.245 18.7254 12.751 18.9817L12.75 21.25C12.75 21.6642 12.4142 22 12 22C11.6203 22 11.3065 21.7178 11.2568 21.3518L11.25 21.25L11.25 18.9818C7.83323 18.7316 5.12283 15.938 5.00406 12.4863L5 12.25V11.75C5 11.3358 5.33579 11 5.75 11C6.1297 11 6.44349 11.2822 6.49315 11.6482L6.5 11.75V12.25C6.5 15.077 8.73445 17.3821 11.5336 17.4956L11.75 17.5H12.25C15.077 17.5 17.3821 15.2656 17.4956 12.4664L17.5 12.25V11.75C17.5 11.3358 17.8358 11 18.25 11ZM12 2C14.2091 2 16 3.79086 16 6V12C16 14.2091 14.2091 16 12 16C9.79086 16 8 14.2091 8 12V6C8 3.79086 9.79086 2 12 2ZM12 3.5C10.6193 3.5 9.5 4.61929 9.5 6V12C9.5 13.3807 10.6193 14.5 12 14.5C13.3807 14.5 14.5 13.3807 14.5 12V6C14.5 4.61929 13.3807 3.5 12 3.5Z" fill="currentColor"/>
-</svg><img id="podcastCover" class="cover" alt="Podcast cover" hidden /></div><div class="meta"><h1 id="podcastTitle"></h1><p id="podcastAuthor"></p><p id="podcastDesc"></p></div></div>
-        <p id="feedStatus" role="status" hidden></p>
+</svg><img id="podcastCover" class="cover" alt="Podcast cover" hidden /></div><div class="meta"><p id="podcastAuthor"></p><h1 id="podcastTitle"></h1><div id="podcastMetadata" class="podcast-metadata" hidden></div><p id="podcastDesc"></p></div></div>
         <div id="feedDownload" class="feed-download" hidden>
+          <div class="feed-error-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/><path d="M12 7v6m0 3v.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+          <div class="feed-error-copy">
+          <p id="feedStatus" role="status" hidden></p>
           <p>Try opening this feed in Podcasted for Windows.</p>
-          <a class="feed-download-link" href="https://apps.microsoft.com/detail/9nxwgr2b1p26?cid=webplayer" target="_blank" rel="noopener noreferrer">Download Podcasted for Windows</a>
+          <a class="feed-download-link" href="https://apps.microsoft.com/detail/9nxwgr2b1p26?cid=webplayer" target="_blank" rel="noopener noreferrer"><span>Download Podcasted for Windows</span><svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M12 3v12m-4-4 4 4 4-4M5 16v4h14v-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </div>
         </div>
         <div id="episodeTools" class="episode-tools" hidden>
           <div class="episode-filter-field">
