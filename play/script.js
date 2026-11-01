@@ -101,6 +101,13 @@ document.addEventListener("DOMContentLoaded", async function () {
   await Promise.all(["fluent-button", "fluent-text-input", "fluent-dropdown", "fluent-listbox", "fluent-option", "fluent-slider"].map(tag => customElements.whenDefined(tag)));
   // Wait for v3 dropdown option slots before restoring saved control values.
   await new Promise(resolve => requestAnimationFrame(resolve));
+  // Mobile autofill reads the native input, not just the Fluent host attributes.
+  const nativeSearchInput = document.getElementById("searchInput").shadowRoot?.querySelector("input");
+  if (nativeSearchInput) {
+    for (const [name, value] of Object.entries({ type: "search", name: "podcast-search", autocomplete: "off", autocorrect: "off", autocapitalize: "none", spellcheck: "false", enterkeyhint: "search" })) {
+      nativeSearchInput.setAttribute(name, value);
+    }
+  }
   document.getElementById("searchInput").addEventListener("keydown", event => {
     if (event.key === "Enter" && !event.isComposing) handleSearchSubmit(event);
   });
